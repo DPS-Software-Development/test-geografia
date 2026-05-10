@@ -1724,7 +1724,24 @@ const Store = {
     localStorage.setItem('geo_profiles_custom', JSON.stringify(customs));
     return id;
   },
-  getAllProfiles: () => [...DEFAULT_PROFILES, ...Store.getCustomProfiles()],
+  getAllProfiles: () => {
+    // Dedup: if a custom profile has the same id as a default one (e.g. user
+    // typed "Papà" manually before that profile was added to defaults), the
+    // default wins so we don't show the same name twice in the picker.
+    const defaultIds = new Set(DEFAULT_PROFILES.map(p => p.id));
+    const customs = Store.getCustomProfiles().filter(p => !defaultIds.has(p.id));
+    return [...DEFAULT_PROFILES, ...customs];
+  },
+  // One-shot cleanup: remove custom profile entries that duplicate a default
+  // by id. Idempotent — safe to call on every boot.
+  cleanupDuplicateProfiles: () => {
+    const defaultIds = new Set(DEFAULT_PROFILES.map(p => p.id));
+    const customs = Store.getCustomProfiles();
+    const filtered = customs.filter(p => !defaultIds.has(p.id));
+    if (filtered.length !== customs.length) {
+      localStorage.setItem('geo_profiles_custom', JSON.stringify(filtered));
+    }
+  },
   getProfileName: (id) => {
     const p = Store.getAllProfiles().find(x => x.id === id);
     return p ? p.name : (id || '');
@@ -3253,6 +3270,10 @@ function init() {
       showScreen('screen-home');
     }
   });
+
+  // Remove any custom profile entries that shadow a default (e.g. legacy "Papà"
+  // created manually before it was added to DEFAULT_PROFILES).
+  Store.cleanupDuplicateProfiles();
 
   // Restore profile if present and still valid
   const savedProfile = Store.getProfile();
