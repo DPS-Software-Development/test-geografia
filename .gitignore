@@ -1,6 +1,19 @@
 # Build source data (re-downloadable from openpolis/geojson-italy)
 italy_regions.geojson
 
+# Personal study material from textbook (locale only, deletion in 7 days)
+regioni-pdf/
+regioni-pdf-source/
+*.zip
+hubscuola-libro-*.zip
+chapter-*.zip
+master.pdf
+chapter-order.json
+
+# Per-region text extractions (contain textbook prose — locale only)
+_*_extracted.txt
+*_extracted.txt
+
 # Local dev/preview server config
 .claude/launch.json
 .claude/settings.local.json

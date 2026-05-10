@@ -29,9 +29,9 @@
       "lakes": ["Maggiore", "Orta"] },
 
     { "id": "lombardia",              "name": "Lombardia",              "capital": "Milano",     "position": "nord-ovest", "borders": ["piemonte", "trentino-alto-adige", "veneto", "emilia-romagna"],
-      "rivers": ["Po", "Ticino", "Adda", "Oglio"],
-      "mountains": ["Alpi", "Prealpi", "Ortles"],
-      "lakes": ["Garda", "Como", "Maggiore", "Iseo"] },
+      "rivers": ["Po", "Ticino", "Adda", "Oglio", "Mincio"],
+      "mountains": ["Alpi", "Bernina", "Adamello", "Ortles", "Cevedale"],
+      "lakes": ["Garda", "Como", "Maggiore", "Iseo", "Lugano"] },
 
     { "id": "liguria",                "name": "Liguria",                "capital": "Genova",     "position": "nord-ovest", "borders": ["piemonte", "emilia-romagna", "toscana"],
       "rivers": ["Magra", "Roia"],
@@ -40,8 +40,8 @@
 
     { "id": "trentino-alto-adige",    "name": "Trentino-Alto Adige",    "capital": "Trento",     "position": "nord-est",   "borders": ["lombardia", "veneto"],
       "rivers": ["Adige", "Isarco"],
-      "mountains": ["Dolomiti", "Marmolada", "Ortles"],
-      "lakes": ["Garda", "Caldonazzo", "Molveno", "Ledro"] },
+      "mountains": ["Dolomiti", "Marmolada", "Ortles", "Cevedale"],
+      "lakes": ["Garda", "Braies"] },
 
     { "id": "veneto",                 "name": "Veneto",                 "capital": "Venezia",    "position": "nord-est",   "borders": ["lombardia", "trentino-alto-adige", "friuli-venezia-giulia", "emilia-romagna"],
       "rivers": ["Po", "Adige", "Piave", "Brenta"],
@@ -59,9 +59,9 @@
       "lakes": [] },
 
     { "id": "toscana",                "name": "Toscana",                "capital": "Firenze",    "position": "centro",     "borders": ["liguria", "emilia-romagna", "marche", "umbria", "lazio"],
-      "rivers": ["Arno", "Serchio", "Ombrone"],
-      "mountains": ["Apuane", "Appennino Tosco-Emiliano", "Monte Amiata"],
-      "lakes": ["Massaciuccoli"] },
+      "rivers": ["Arno", "Serchio", "Ombrone", "Cecina"],
+      "mountains": ["Alpi Apuane", "Appennino Tosco-Emiliano", "Monte Amiata"],
+      "lakes": [] },
 
     { "id": "umbria",                 "name": "Umbria",                 "capital": "Perugia",    "position": "centro",     "borders": ["toscana", "marche", "lazio"],
       "rivers": ["Tevere", "Nera", "Chiascio"],
@@ -74,9 +74,9 @@
       "lakes": [] },
 
     { "id": "lazio",                  "name": "Lazio",                  "capital": "Roma",       "position": "centro",     "borders": ["toscana", "umbria", "marche", "abruzzo", "molise", "campania"],
-      "rivers": ["Tevere", "Aniene", "Liri", "Garigliano"],
-      "mountains": ["Appennino Centrale", "Monti Lepini", "Monti Aurunci"],
-      "lakes": ["Bracciano", "Bolsena", "Albano"] },
+      "rivers": ["Tevere"],
+      "mountains": ["Appennino Centrale", "Monti Cimini", "Colli Albani"],
+      "lakes": ["Bracciano", "Bolsena", "Vico"] },
 
     { "id": "abruzzo",                "name": "Abruzzo",                "capital": "L'Aquila",   "position": "sud",        "borders": ["marche", "lazio", "molise"],
       "rivers": ["Pescara", "Sangro", "Aterno"],
@@ -109,7 +109,7 @@
       "lakes": [] },
 
     { "id": "sicilia",                "name": "Sicilia",                "capital": "Palermo",    "position": "isole",      "borders": [],
-      "rivers": ["Salso", "Simeto", "Belice", "Platani"],
+      "rivers": ["Salso", "Simeto", "Platani"],
       "mountains": ["Etna", "Madonie", "Nebrodi", "Peloritani"],
       "lakes": [] },
 
