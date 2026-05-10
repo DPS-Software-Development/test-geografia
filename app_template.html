@@ -1460,6 +1460,16 @@ function prep(region) {
   return 'la ';
 }
 
+// "in + articolo" -> nel/nella/nelle/nell'
+function inPrep(region) {
+  const masc = ['piemonte','veneto','lazio','molise','trentino-alto-adige','friuli-venezia-giulia'];
+  const apostrofo = ['abruzzo','umbria','emilia-romagna'];
+  if (region.id === 'marche') return 'nelle ';
+  if (apostrofo.includes(region.id)) return "nell'";
+  if (masc.includes(region.id)) return 'nel ';
+  return 'nella ';
+}
+
 function genCapitalText(region) {
   // Articolo "del/della" davanti al nome regione per "qual è il capoluogo del..."
   const masc = ['piemonte','veneto','lazio','molise','trentino-alto-adige','friuli-venezia-giulia'];
@@ -1515,7 +1525,7 @@ function genQuestionMountain(region) {
   const choices = shuffle([correct, ...wrong]);
   return {
     type: 'mountain',
-    text: `Quale catena o monte si trova in ${prep(region)}${region.name}?`,
+    text: `Quale catena o monte si trova ${inPrep(region)}${region.name}?`,
     showMap: true,
     mapHighlight: region.id,
     correct,
@@ -1535,7 +1545,7 @@ function genQuestionLake(region) {
   const choices = shuffle([correct, ...wrong]);
   return {
     type: 'lake',
-    text: `Quale lago si trova in ${prep(region)}${region.name}?`,
+    text: `Quale lago si trova ${inPrep(region)}${region.name}?`,
     showMap: true,
     mapHighlight: region.id,
     correct,
