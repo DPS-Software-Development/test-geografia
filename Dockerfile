@@ -1,10 +1,17 @@
-FROM nginx:alpine
+FROM node:20-alpine
+WORKDIR /app
 
-# Replace the default site with one that listens on $PORT (Railway convention).
-# nginx:alpine's docker-entrypoint runs envsubst on /etc/nginx/templates/*.template at startup.
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY index.html /usr/share/nginx/html/index.html
+# Install deps first (better build cache)
+COPY package.json package-lock.json* ./
+RUN npm install --omit=dev
+
+# App files
+COPY server.js index.html ./
 
 ENV PORT=8080
+ENV NODE_ENV=production
+# RAILWAY_VOLUME_MOUNT_PATH set automatically when a volume is attached;
+# falls back to /tmp/test-geografia-data if missing (data won't persist across deploys).
+
 EXPOSE 8080
+CMD ["node", "server.js"]

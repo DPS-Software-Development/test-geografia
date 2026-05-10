@@ -1070,6 +1070,102 @@ button {
   }
 }
 
+/* ----- PARENT DASHBOARD ----- */
+.papa-intro {
+  font-size: 0.92rem;
+  color: var(--text-soft);
+  margin-bottom: 16px;
+  line-height: 1.45;
+}
+.papa-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+.papa-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.papa-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--primary-dark);
+  flex-shrink: 0;
+}
+.papa-meta { flex: 1; min-width: 0; }
+.papa-meta-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+.papa-meta-stats {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+.papa-section-title {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  margin: 12px 0 6px;
+}
+.papa-list { display: flex; flex-direction: column; gap: 8px; }
+.papa-weak-row {
+  background: var(--bg);
+  border-left: 4px solid var(--wrong);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+.papa-strong-row {
+  background: var(--bg);
+  border-left: 4px solid var(--correct);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+.papa-row-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.papa-row-meta {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+.papa-action {
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+.papa-action:active { transform: scale(0.97); }
+.papa-empty {
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  padding: 18px 4px;
+  font-style: italic;
+}
+.papa-trend-up   { color: var(--correct); font-weight: 700; }
+.papa-trend-down { color: var(--wrong);   font-weight: 700; }
+.papa-trend-flat { color: var(--text-soft); }
+
 /* ----- HOVER STATES (mouse-only, not sticky on touch) -----
    Applied only to devices with a true hover-capable fine pointer.
    On touch devices, :hover otherwise sticks after a tap and makes the
@@ -1299,6 +1395,16 @@ template { display: none; }
     <div class="confetti-container" id="confetti"></div>
   </section>
 
+  <!-- ============ PARENT DASHBOARD (papà only) ============ -->
+  <section id="screen-papa-dashboard" class="screen">
+    <div class="study-header">
+      <button class="btn-icon" id="btn-back-papa" aria-label="Cambia profilo">←</button>
+      <h2 class="study-title">📊 Dashboard genitore</h2>
+    </div>
+    <p class="papa-intro">Vedi cosa ogni bambina sa bene e cosa deve ripassare. Clicca un bottone "🎯 Fai ripassare" per lanciare un quiz mirato sul suo profilo.</p>
+    <div id="papa-dashboard-body"></div>
+  </section>
+
   <!-- Italy SVG template (cloned where needed) -->
   <template id="italy-svg">
 <!-- INLINE_SVG -->
@@ -1504,8 +1610,13 @@ function getRecommendation(scores, gender) {
 // ============ PROFILES ============
 const DEFAULT_PROFILES = [
   { id: 'emma', name: 'Emma' },
-  { id: 'sofia', name: 'Sofia' }
+  { id: 'sofia', name: 'Sofia' },
+  { id: 'papa', name: 'Papà' }
 ];
+
+// "papa" is the parent profile: hidden from the quiz "interrogated profiles"
+// but visible as a profile-card on the home selector; it unlocks the dashboard.
+const PARENT_PROFILE_ID = 'papa';
 
 const AVATAR_COLORS = ['#f4d8a8', '#c5d9b8', '#f4b8b8', '#b8d9e0', '#e0c8e8', '#d9d2b8', '#f0c4a4', '#b8e0c8'];
 
@@ -1571,17 +1682,24 @@ const Store = {
   getProfile: () => localStorage.getItem('geo_profile'),
   setProfile: (p) => localStorage.setItem('geo_profile', p),
   getScores: (p) => JSON.parse(localStorage.getItem('geo_scores_' + p) || '[]'),
-  addScore: (p, score, total, errors, difficulty) => {
+  setScoresLocal: (p, list) => {
+    if (list.length > 200) list.length = 200;
+    localStorage.setItem('geo_scores_' + p, JSON.stringify(list));
+  },
+  addScore: (p, score, total, errors, difficulty, byTopic) => {
     const list = Store.getScores(p);
-    list.unshift({
+    const entry = {
       date: Date.now(),
       score,
       total,
       difficulty: difficulty || 'easy',
-      errors: errors || []
-    });
-    if (list.length > 50) list.length = 50;
-    localStorage.setItem('geo_scores_' + p, JSON.stringify(list));
+      errors: errors || [],
+      byTopic: byTopic || null   // {"type:regionId": {c:correct, w:wrong}} — used by dashboard
+    };
+    list.unshift(entry);
+    Store.setScoresLocal(p, list);
+    // Fire-and-forget sync to server. Failure is silent (offline-tolerant).
+    Sync.pushScore(p, entry);
   },
   getSound: () => localStorage.getItem('geo_sound') === 'on',
   setSound: (on) => localStorage.setItem('geo_sound', on ? 'on' : 'off'),
@@ -1612,6 +1730,112 @@ const Store = {
     return p ? p.name : (id || '');
   }
 };
+
+// ============ SERVER SYNC ============
+// Talks to the Express backend (server.js). Best-effort: errors are silent so
+// the app still works offline.
+const Sync = (() => {
+  const API = location.origin + '/api/sync';
+  const BASELINE_KEY = 'geo_synced_v1';
+
+  function isOnline() { return navigator.onLine !== false; }
+
+  // Merge two arrays of scores by `date` (unique-by-timestamp; newest first).
+  function mergeScores(localList, remoteList) {
+    const seen = new Map();
+    for (const s of remoteList || []) {
+      if (s && s.date) seen.set(s.date, s);
+    }
+    for (const s of localList || []) {
+      if (s && s.date && !seen.has(s.date)) seen.set(s.date, s);
+    }
+    return [...seen.values()].sort((a, b) => b.date - a.date).slice(0, 200);
+  }
+
+  // Pull all profiles from server and merge into localStorage. Returns Promise<true|false>.
+  async function pullAll() {
+    if (!isOnline()) return false;
+    try {
+      const r = await fetch(API, { cache: 'no-store' });
+      if (!r.ok) return false;
+      const remote = await r.json();
+      const allLocalProfiles = Store.getAllProfiles().map(p => p.id);
+      const allRemoteProfiles = Object.keys(remote || {});
+      // Profiles that exist on server but not in our customs → add as custom
+      for (const remoteId of allRemoteProfiles) {
+        if (!allLocalProfiles.includes(remoteId)) {
+          // Best-effort: use the id as display name (sluggified back to titlecase).
+          const customs = Store.getCustomProfiles();
+          customs.push({ id: remoteId, name: remoteId.charAt(0).toUpperCase() + remoteId.slice(1).replace(/-/g, ' ') });
+          localStorage.setItem('geo_profiles_custom', JSON.stringify(customs));
+        }
+      }
+      // Merge scores per profile
+      const allKnown = new Set([...allLocalProfiles, ...allRemoteProfiles]);
+      for (const id of allKnown) {
+        const local = Store.getScores(id);
+        const remoteScores = (remote || {})[id] || [];
+        const merged = mergeScores(local, remoteScores);
+        if (merged.length) Store.setScoresLocal(id, merged);
+      }
+      return true;
+    } catch (e) { return false; }
+  }
+
+  // Push a single new score (append).
+  async function pushScore(profileId, scoreEntry) {
+    if (!isOnline()) return false;
+    try {
+      const r = await fetch(API + '/' + encodeURIComponent(profileId) + '/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(scoreEntry)
+      });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+
+  // Push the full scores array for a profile (used for baseline import).
+  async function putScores(profileId, scores) {
+    if (!isOnline()) return false;
+    try {
+      const r = await fetch(API + '/' + encodeURIComponent(profileId), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scores })
+      });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+
+  // On first launch of the new version: take whatever is in localStorage and
+  // push it to the server so existing histories are not lost.
+  async function importBaselineIfNeeded() {
+    if (localStorage.getItem(BASELINE_KEY)) return false;  // already done
+    if (!isOnline()) return false;
+    const allProfileIds = Store.getAllProfiles().map(p => p.id);
+    // include any geo_scores_* keys that aren't covered (custom profiles previously created)
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('geo_scores_')) {
+        const id = k.slice('geo_scores_'.length);
+        if (!allProfileIds.includes(id)) allProfileIds.push(id);
+      }
+    }
+    let imported = 0;
+    for (const id of allProfileIds) {
+      const local = Store.getScores(id);
+      if (local.length) {
+        const ok = await putScores(id, local);
+        if (ok) imported += local.length;
+      }
+    }
+    localStorage.setItem(BASELINE_KEY, '1');
+    return imported;
+  }
+
+  return { pullAll, pushScore, putScores, importBaselineIfNeeded, mergeScores };
+})();
 
 // ============ AUDIO ============
 const Audio = (() => {
@@ -2206,7 +2430,16 @@ function showResult() {
       selected: a.selected,
       typed: !!a.typed
     }));
-  Store.addScore(state.profile, correct, total, errorsForStore, state.difficulty || 'easy');
+  // byTopic breakdown for the parent dashboard: aggregate correct/wrong by
+  // (questionType, regionId). global questions without a region get the key "global".
+  const byTopic = {};
+  state.answers.forEach(a => {
+    const regionId = a.question.region?.id || 'global';
+    const key = a.question.type + ':' + regionId;
+    if (!byTopic[key]) byTopic[key] = { c: 0, w: 0 };
+    if (a.correct) byTopic[key].c++; else byTopic[key].w++;
+  });
+  Store.addScore(state.profile, correct, total, errorsForStore, state.difficulty || 'easy', byTopic);
 
   // Recommendation card based on history
   const rec = getRecommendation(Store.getScores(state.profile), state.gender);
@@ -2347,6 +2580,12 @@ function selectProfile(id) {
   Store.setProfile(id);
   const displayName = Store.getProfileName(id);
   state.gender = detectGender(displayName);
+  // Parent profile: go straight to the dashboard instead of the quiz home.
+  if (id === PARENT_PROFILE_ID) {
+    renderParentDashboard();
+    showScreen('screen-papa-dashboard');
+    return;
+  }
   $('#home-name').textContent = displayName;
   $('#home-title').textContent = gtext(state.gender,
     'Pronto per il quiz?',
@@ -2482,6 +2721,193 @@ function buildStudyBordersSection(borders) {
     c.addEventListener('click', () => openStudyCard(c.dataset.region));
   });
   return s;
+}
+
+// ============ PARENT DASHBOARD ============
+// Aggregates each child's scores into a per-topic breakdown (regions × question types)
+// to surface "what they should review" with one-click action buttons.
+
+const TOPIC_LABEL = {
+  'capital': 'Capoluogo',
+  'border-is': 'Confini',
+  'border-not': 'Confini',
+  'position': 'Posizione',
+  'identify': 'Riconoscere la regione',
+  'river': 'Fiumi',
+  'mountain': 'Monti',
+  'lake': 'Laghi',
+  'global': "Italia in generale"
+};
+
+function buildTopicAnalysis(scores) {
+  // Returns { weak: [{type, regionId, c, w, total, pct}], strong: [...], total }
+  // Uses only scores that have the new byTopic field; older entries are ignored
+  // (they're factored only via the legacy "errors" array, see fallback below).
+  const agg = {};   // "type:regionId" -> {c, w}
+  for (const s of scores) {
+    if (s.byTopic) {
+      for (const [k, v] of Object.entries(s.byTopic)) {
+        if (!agg[k]) agg[k] = { c: 0, w: 0 };
+        agg[k].c += v.c || 0;
+        agg[k].w += v.w || 0;
+      }
+    } else if (s.errors && s.errors.length) {
+      // Fallback for legacy entries (no byTopic): count only the wrongs we know about.
+      for (const e of s.errors) {
+        if (!e.type) continue;
+        const k = e.type + ':' + (e.region || 'global');
+        if (!agg[k]) agg[k] = { c: 0, w: 0 };
+        agg[k].w += 1;
+      }
+    }
+  }
+  const items = Object.entries(agg).map(([k, v]) => {
+    const [type, regionId] = k.split(':');
+    const total = v.c + v.w;
+    return { type, regionId, c: v.c, w: v.w, total, pct: total ? Math.round((v.c / total) * 100) : 0 };
+  });
+  // Weak: at least 1 wrong, sort by wrong count desc, then by pct asc.
+  const weak = items
+    .filter(x => x.w >= 1)
+    .sort((a, b) => b.w - a.w || a.pct - b.pct)
+    .slice(0, 5);
+  // Strong: at least 3 answers, pct >= 80, no wrong recently.
+  const strong = items
+    .filter(x => x.total >= 3 && x.pct >= 80 && x.w === 0)
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 5);
+  return { weak, strong, totalTopics: items.length };
+}
+
+function topicLabel(type, regionId, gender) {
+  const base = TOPIC_LABEL[type] || type;
+  if (regionId === 'global' || !regionId) return base;
+  const region = REGION_BY_ID[regionId];
+  if (!region) return base;
+  // "Fiumi della Campania", "Capoluogo del Lazio", etc.
+  // Reuse the same article logic the question generators use.
+  let preposition;
+  const masc = ['piemonte','veneto','lazio','molise','trentino-alto-adige','friuli-venezia-giulia'];
+  const apost = ['abruzzo','umbria','emilia-romagna'];
+  if (regionId === 'marche') preposition = 'delle';
+  else if (apost.includes(regionId)) preposition = "dell'";
+  else if (masc.includes(regionId)) preposition = 'del';
+  else preposition = 'della';
+  const space = preposition.endsWith("'") ? '' : ' ';
+  if (type === 'position') return `${base} ${preposition}${space}${region.name}`;
+  if (type === 'identify') return `Riconoscere ${region.name}`;
+  return `${base} ${preposition}${space}${region.name}`;
+}
+
+function renderParentDashboard() {
+  const host = $('#papa-dashboard-body');
+  if (!host) return;
+
+  const profiles = Store.getAllProfiles().filter(p => p.id !== PARENT_PROFILE_ID);
+  const html = profiles.map(p => {
+    const scores = Store.getScores(p.id);
+    const initial = (p.name[0] || '?').toUpperCase();
+    const color = profileColor(p.id);
+    if (!scores.length) {
+      return `<div class="papa-card">
+        <div class="papa-card-head">
+          <div class="papa-avatar" style="background:${color}">${escapeHtml(initial)}</div>
+          <div class="papa-meta">
+            <div class="papa-meta-name">${escapeHtml(p.name)}</div>
+            <div class="papa-meta-stats">Ancora nessun quiz. Quando ${escapeHtml(p.name)} giocherà, qui vedrai le statistiche.</div>
+          </div>
+        </div>
+      </div>`;
+    }
+    const last20 = scores.slice(0, 20);
+    const last5 = scores.slice(0, 5);
+    const avg = arr => arr.length ? Math.round(arr.reduce((a, s) => a + (s.total ? (s.score / s.total) * 100 : 0), 0) / arr.length) : 0;
+    const mean5 = avg(last5);
+    let trendIcon = '➡️', trendClass = 'papa-trend-flat', trendText = 'stabile';
+    if (last5.length >= 4) {
+      const oldTwo = avg(last5.slice(-2));
+      const newTwo = avg(last5.slice(0, 2));
+      const delta = newTwo - oldTwo;
+      if (delta > 5) { trendIcon = '⬆️'; trendClass = 'papa-trend-up'; trendText = 'in salita'; }
+      else if (delta < -5) { trendIcon = '⬇️'; trendClass = 'papa-trend-down'; trendText = 'in calo'; }
+    }
+    const analysis = buildTopicAnalysis(last20);
+    const weakHtml = analysis.weak.length ? analysis.weak.map(w => `
+      <div class="papa-weak-row">
+        <div class="papa-row-label">${escapeHtml(topicLabel(w.type, w.regionId))}</div>
+        <div class="papa-row-meta">${w.w} ${w.w === 1 ? 'errore' : 'errori'}${w.total ? ' su ' + w.total + ' (' + w.pct + '% giuste)' : ''}</div>
+        ${w.regionId && w.regionId !== 'global' ? `<button class="papa-action" data-profile="${p.id}" data-region="${w.regionId}" data-type="${w.type}">🎯 Fai ripassare ${escapeHtml(p.name)}</button>` : ''}
+      </div>`).join('') : '<div class="papa-empty">Nessun argomento da ripassare!</div>';
+    const strongHtml = analysis.strong.length ? analysis.strong.map(s => `
+      <div class="papa-strong-row">
+        <div class="papa-row-label">${escapeHtml(topicLabel(s.type, s.regionId))}</div>
+        <div class="papa-row-meta">${s.pct}% giuste su ${s.total}</div>
+      </div>`).join('') : '<div class="papa-empty">Servono più quiz per misurare le competenze acquisite.</div>';
+    return `<div class="papa-card">
+      <div class="papa-card-head">
+        <div class="papa-avatar" style="background:${color}">${escapeHtml(initial)}</div>
+        <div class="papa-meta">
+          <div class="papa-meta-name">${escapeHtml(p.name)}</div>
+          <div class="papa-meta-stats">${scores.length} ${scores.length === 1 ? 'partita' : 'partite'} · media ultime 5: <b>${mean5}%</b> <span class="${trendClass}">${trendIcon} ${trendText}</span></div>
+        </div>
+      </div>
+      <div class="papa-section-title">🔴 Da ripassare</div>
+      <div class="papa-list">${weakHtml}</div>
+      <div class="papa-section-title">🟢 Padroneggia</div>
+      <div class="papa-list">${strongHtml}</div>
+    </div>`;
+  }).join('');
+
+  host.innerHTML = html || '<div class="papa-empty">Nessun profilo bambino. Crea Emma o Sofia dalla home.</div>';
+}
+
+// Generate a focused mini-quiz on a single (region, type) — invoked from the dashboard.
+function startMiniQuizForTopic(profileId, regionId, type) {
+  // Switch the active profile to the child (so the score saves under their name).
+  state.profile = profileId;
+  Store.setProfile(profileId);
+  state.gender = detectGender(Store.getProfileName(profileId));
+
+  const region = REGION_BY_ID[regionId];
+  if (!region) return;
+  const candidates = [];
+  // Most generators produce a single deterministic question per (region, type),
+  // but `border-is`/`border-not` and the per-region lists can yield multiple.
+  for (let i = 0; i < 30; i++) {
+    const q = QUESTION_GENERATORS[type] && QUESTION_GENERATORS[type](region);
+    if (q) candidates.push(q);
+  }
+  // Dedup by correct answer
+  const seen = new Set();
+  let unique = candidates.filter(q => {
+    const k = q.type + ':' + q.correct;
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+  // Pad with same-type questions on other regions so the quiz is at least 5 long.
+  if (unique.length < 5) {
+    const others = REGIONS.filter(r => r.id !== regionId);
+    for (const r of shuffle(others)) {
+      const q = QUESTION_GENERATORS[type] && QUESTION_GENERATORS[type](r);
+      if (q) {
+        const k = q.type + ':' + q.correct;
+        if (!seen.has(k)) { seen.add(k); unique.push(q); }
+      }
+      if (unique.length >= 5) break;
+    }
+  }
+  const questions = shuffle(unique).slice(0, 5);
+  if (!questions.length) return;
+  state.questions = questions;
+  state.questionCount = questions.length;
+  state.currentIndex = 0;
+  state.answers = [];
+  state.locked = false;
+  state.difficulty = 'easy';
+  if (typeof studyState !== 'undefined') delete studyState.fromMiniQuiz;
+  $('#q-total').textContent = questions.length;
+  showScreen('screen-quiz');
+  renderQuestion();
 }
 
 function startMiniQuizForRegion(regionId) {
@@ -2669,6 +3095,22 @@ function init() {
     showScreen('screen-study-list');
   });
 
+  // Parent dashboard: back to profile selection
+  $('#btn-back-papa').addEventListener('click', () => {
+    Audio.click();
+    showScreen('screen-profile');
+    renderProfileButtons();
+    renderFamilyProgress();
+  });
+
+  // Parent dashboard: delegate clicks on "🎯 Fai ripassare X" buttons
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.papa-action');
+    if (!btn) return;
+    Audio.click();
+    startMiniQuizForTopic(btn.dataset.profile, btn.dataset.region, btn.dataset.type);
+  });
+
   // Family progress: delegate daily-breakdown toggle
   document.addEventListener('click', e => {
     const btn = e.target.closest('.fp-toggle');
@@ -2812,6 +3254,25 @@ function init() {
   } else {
     showScreen('screen-profile');
   }
+
+  // Server sync (best-effort, async). Order matters:
+  // 1. Push local localStorage to server as baseline on first run after the
+  //    server-enabled version ships — protects existing histories.
+  // 2. Pull everything from server and merge into localStorage so the active
+  //    profile sees updated stats from other devices.
+  (async () => {
+    try {
+      await Sync.importBaselineIfNeeded();
+      const ok = await Sync.pullAll();
+      if (ok) {
+        // Re-render whatever's currently on screen so new data shows up.
+        const active = document.querySelector('.screen.active')?.id;
+        if (active === 'screen-home') renderStats();
+        else if (active === 'screen-profile') { renderProfileButtons(); renderFamilyProgress(); }
+        else if (active === 'screen-papa-dashboard') renderParentDashboard();
+      }
+    } catch (e) { /* offline or server down — fine, app stays usable */ }
+  })();
 }
 
 document.addEventListener('DOMContentLoaded', init);
