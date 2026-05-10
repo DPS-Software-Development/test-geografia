@@ -1301,13 +1301,13 @@ const REGIONS = [
   { id:'liguria', name:'Liguria', capital:'Genova', position:'nord-ovest', borders:['piemonte','emilia-romagna','toscana'],
     rivers:['Magra','Roia'], mountains:['Alpi Marittime','Appennino Ligure'], lakes:[] },
   { id:'trentino-alto-adige', name:'Trentino-Alto Adige', capital:'Trento', position:'nord-est', borders:['lombardia','veneto'],
-    rivers:['Adige','Isarco'], mountains:['Dolomiti','Marmolada','Ortles'], lakes:['Garda'] },
+    rivers:['Adige','Isarco'], mountains:['Dolomiti','Marmolada','Ortles'], lakes:['Garda','Caldonazzo','Molveno','Ledro'] },
   { id:'veneto', name:'Veneto', capital:'Venezia', position:'nord-est', borders:['lombardia','trentino-alto-adige','friuli-venezia-giulia','emilia-romagna'],
     rivers:['Po','Adige','Piave','Brenta'], mountains:['Dolomiti','Marmolada','Prealpi Venete'], lakes:['Garda'] },
   { id:'friuli-venezia-giulia', name:'Friuli-Venezia Giulia', capital:'Trieste', position:'nord-est', borders:['veneto'],
     rivers:['Tagliamento','Isonzo'], mountains:['Alpi Carniche','Alpi Giulie'], lakes:[] },
   { id:'emilia-romagna', name:'Emilia-Romagna', capital:'Bologna', position:'nord-est', borders:['lombardia','veneto','marche','toscana','liguria'],
-    rivers:['Po','Reno','Trebbia'], mountains:['Appennino Tosco-Emiliano','Monte Cimone'], lakes:[] },
+    rivers:['Po','Reno','Secchia','Panaro'], mountains:['Appennino Tosco-Emiliano','Monte Cimone'], lakes:[] },
   { id:'toscana', name:'Toscana', capital:'Firenze', position:'centro', borders:['liguria','emilia-romagna','marche','umbria','lazio'],
     rivers:['Arno','Serchio','Ombrone'], mountains:['Apuane','Appennino Tosco-Emiliano','Monte Amiata'], lakes:['Massaciuccoli'] },
   { id:'umbria', name:'Umbria', capital:'Perugia', position:'centro', borders:['toscana','marche','lazio'],
@@ -1902,10 +1902,12 @@ function buildQuiz(count, difficulty) {
     attempts++;
     const type = pick(types);
     const region = pick(REGIONS);
-    const key = type + ':' + region.id;
-    if (usedKeys.has(key)) continue;
     const q = QUESTION_GENERATORS[type](region);
     if (!q) continue;
+    // Dedup key: for 'global' use the question text (since region is internal, not input);
+    // for others, region.id (input) is enough since region+type uniquely identifies the question.
+    const key = type === 'global' ? 'global:' + q.text : type + ':' + region.id;
+    if (usedKeys.has(key)) continue;
     usedKeys.add(key);
     questions.push(q);
   }

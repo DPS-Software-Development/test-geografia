@@ -41,7 +41,7 @@
     { "id": "trentino-alto-adige",    "name": "Trentino-Alto Adige",    "capital": "Trento",     "position": "nord-est",   "borders": ["lombardia", "veneto"],
       "rivers": ["Adige", "Isarco"],
       "mountains": ["Dolomiti", "Marmolada", "Ortles"],
-      "lakes": ["Garda"] },
+      "lakes": ["Garda", "Caldonazzo", "Molveno", "Ledro"] },
 
     { "id": "veneto",                 "name": "Veneto",                 "capital": "Venezia",    "position": "nord-est",   "borders": ["lombardia", "trentino-alto-adige", "friuli-venezia-giulia", "emilia-romagna"],
       "rivers": ["Po", "Adige", "Piave", "Brenta"],
@@ -54,7 +54,7 @@
       "lakes": [] },
 
     { "id": "emilia-romagna",         "name": "Emilia-Romagna",         "capital": "Bologna",    "position": "nord-est",   "borders": ["lombardia", "veneto", "marche", "toscana", "liguria"],
-      "rivers": ["Po", "Reno", "Trebbia"],
+      "rivers": ["Po", "Reno", "Secchia", "Panaro"],
       "mountains": ["Appennino Tosco-Emiliano", "Monte Cimone"],
       "lakes": [] },
 
