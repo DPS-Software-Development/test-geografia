@@ -339,6 +339,16 @@ button {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.seg-control-2 button { padding: 12px 0; }
+
+.hint-small {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  margin-top: 8px;
+  text-align: center;
+  font-style: italic;
+}
+
 .toggle-row {
   display: flex;
   justify-content: space-between;
@@ -558,6 +568,95 @@ button {
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-6px); }
   40%, 80% { transform: translateX(6px); }
+}
+
+/* ----- TYPED ANSWER (HARD MODE) ----- */
+.typed-area {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.typed-area.active { display: flex; }
+
+#typed-input {
+  width: 100%;
+  font-size: 1.25rem;
+  padding: 14px 16px;
+  border: 2px solid rgba(58, 125, 138, 0.3);
+  border-radius: var(--radius-sm);
+  background: #fafafa;
+  color: var(--text);
+  font-family: inherit;
+  text-align: center;
+  font-weight: 600;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#typed-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(58, 125, 138, 0.12);
+}
+
+#typed-input:disabled {
+  opacity: 0.85;
+  background: #f0f0f0;
+}
+
+#typed-submit { padding: 14px 18px; }
+
+.typed-feedback {
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 1.4em;
+  text-align: center;
+  padding-top: 4px;
+}
+.typed-feedback.ok { color: var(--correct); }
+.typed-feedback.ko { color: var(--wrong); font-size: 0.95rem; }
+.typed-feedback strong { color: var(--correct); font-weight: 700; }
+
+/* ----- RECOMMENDATION CARD ----- */
+.recommendation-card {
+  background: linear-gradient(135deg, #fff8ee 0%, #fff 100%);
+  border: 2px solid rgba(244, 184, 96, 0.4);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  width: 100%;
+  margin-bottom: 16px;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(244, 184, 96, 0.15);
+}
+
+.rec-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.rec-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.rec-title {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--primary-dark);
+}
+
+.rec-body {
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  margin: 0;
 }
 
 /* ----- MAP STYLES ----- */
@@ -803,6 +902,15 @@ template { display: none; }
     </div>
 
     <div class="config-card">
+      <div class="label">Difficoltà</div>
+      <div class="seg-control seg-control-2" id="difficulty-control">
+        <button data-difficulty="easy" class="active">Facile</button>
+        <button data-difficulty="hard">Difficile ✏️</button>
+      </div>
+      <div class="hint-small" id="difficulty-hint">Tutto a scelta multipla</div>
+    </div>
+
+    <div class="config-card">
       <div class="toggle-row">
         <span class="label" style="margin: 0;">🔊 Suoni</span>
         <label class="switch">
@@ -835,6 +943,17 @@ template { display: none; }
       <h3 class="question-text" id="question-text"></h3>
       <div class="question-map" id="question-map"></div>
       <div class="answers" id="answers"></div>
+      <div class="typed-area" id="typed-area">
+        <input type="text" id="typed-input"
+          placeholder="Scrivi la risposta..."
+          maxlength="40"
+          autocomplete="off"
+          autocapitalize="words"
+          spellcheck="false"
+          aria-label="La tua risposta">
+        <button class="btn-primary" id="typed-submit" disabled>Conferma</button>
+        <div class="typed-feedback" id="typed-feedback" aria-live="polite"></div>
+      </div>
     </div>
   </section>
 
@@ -846,6 +965,14 @@ template { display: none; }
     <p class="result-message" id="result-message"></p>
 
     <div class="result-map" id="result-map"></div>
+
+    <div class="recommendation-card" id="recommendation-card" style="display:none;">
+      <div class="rec-header">
+        <span class="rec-emoji" id="rec-emoji">💡</span>
+        <h3 class="rec-title" id="rec-title"></h3>
+      </div>
+      <p class="rec-body" id="rec-body"></p>
+    </div>
 
     <div class="mistakes-card" id="mistakes-card" style="display:none;">
       <h3>Da rivedere</h3>
@@ -908,11 +1035,110 @@ const REGION_BY_ID = Object.fromEntries(REGIONS.map(r => [r.id, r]));
 const state = {
   profile: null,
   questionCount: 10,
+  difficulty: 'easy',
   questions: [],
   currentIndex: 0,
   answers: [],
   locked: false
 };
+
+// ============ ANSWER NORMALIZATION (for typed mode) ============
+function normalizeForCompare(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
+}
+
+function checkTypedAnswer(userInput, correctAnswer) {
+  const u = normalizeForCompare(userInput);
+  const c = normalizeForCompare(correctAnswer);
+  if (!u) return false;
+  if (u === c) return true;
+  // L'Aquila: accetta anche "Aquila" senza l'articolo
+  if (c === 'laquila' && u === 'aquila') return true;
+  return false;
+}
+
+// ============ RECOMMENDATION (provided by background agent) ============
+function getRecommendation(scores) {
+  if (!scores || scores.length === 0) return null;
+
+  const last = scores.slice(0, 5); // newest first in our store
+  const totalErrors = last.reduce((s, q) => s + (q.errors || []).length, 0);
+  const allPerfect = last.every(q => q.score === q.total);
+
+  const PERFECT = [
+    { title: 'Sei una campionessa!', body: 'Continua così, stai andando alla grande con la geografia italiana.', emoji: '⭐' },
+    { title: 'Bravissima!', body: 'Gli ultimi quiz sono stati perfetti. Prova ad alzare la difficoltà!', emoji: '🏆' },
+    { title: 'Top!', body: 'Conosci le regioni a memoria. Sfida te stessa con il livello successivo!', emoji: '✨' }
+  ];
+  if (allPerfect) return PERFECT[Math.floor(Math.random() * PERFECT.length)];
+
+  const byType = {}, byArea = {}, byTypeArea = {};
+  for (const q of last) {
+    for (const e of (q.errors || [])) {
+      const area = (REGION_BY_ID[e.region] || {}).position || 'altro';
+      byType[e.type] = (byType[e.type] || 0) + 1;
+      byArea[area] = (byArea[area] || 0) + 1;
+      const k = e.type + '|' + area;
+      byTypeArea[k] = (byTypeArea[k] || 0) + 1;
+    }
+  }
+
+  const top = obj => Object.entries(obj).sort((a, b) => b[1] - a[1])[0];
+  const tType = top(byType), tArea = top(byArea), tCombo = top(byTypeArea);
+
+  const TYPE_LABEL = {
+    'capital': 'i capoluoghi',
+    'border-is': 'i confini tra regioni',
+    'border-not': 'i confini tra regioni',
+    'position': 'la posizione delle regioni sulla mappa',
+    'identify': 'il riconoscimento delle regioni'
+  };
+  const AREA_LABEL = {
+    'nord-ovest': 'Nord-Ovest', 'nord-est': 'Nord-Est',
+    'centro': 'Centro Italia', 'sud': 'Sud Italia', 'isole': 'le Isole'
+  };
+
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+  if (tCombo && tCombo[1] >= 2 && tCombo[1] >= Math.ceil(totalErrors * 0.4)) {
+    const [type, area] = tCombo[0].split('|');
+    const t = TYPE_LABEL[type] || 'questo tipo di domande';
+    const a = AREA_LABEL[area] || 'questa zona';
+    return pick([
+      { title: 'Un piccolo ripasso!', body: `Concentrati su ${t} del ${a}: con un po' di pratica saranno facilissimi!`, emoji: '🗺️' },
+      { title: 'Sei sulla strada giusta', body: `Ti consiglio di rivedere ${t} del ${a}. Ce la fai!`, emoji: '📚' },
+      { title: 'Suggerimento per te', body: `${t.charAt(0).toUpperCase() + t.slice(1)} del ${a} ti daranno meno filo da torcere con un ripassino.`, emoji: '💡' }
+    ]);
+  }
+
+  if (tType && tType[1] >= 2 && tType[1] >= Math.ceil(totalErrors * 0.5)) {
+    const t = TYPE_LABEL[tType[0]] || 'queste domande';
+    return pick([
+      { title: 'Idea per migliorare', body: `Ti consiglio di ripassare ${t}: vedrai che diventeranno il tuo punto forte!`, emoji: '📖' },
+      { title: 'Prossimo obiettivo', body: `Dedica un po' di tempo a ${t} e farai un salto in avanti!`, emoji: '🎯' },
+      { title: 'Piccolo consiglio', body: `Concentrati su ${t} nel prossimo quiz, sei vicinissima!`, emoji: '✏️' }
+    ]);
+  }
+
+  if (tArea && tArea[1] >= 2 && tArea[1] >= Math.ceil(totalErrors * 0.5)) {
+    const a = AREA_LABEL[tArea[0]] || 'questa zona';
+    return pick([
+      { title: 'Esploriamo insieme', body: `Concentrati sulle regioni del ${a}: dai un'occhiata alla mappa e saranno tue!`, emoji: '🧭' },
+      { title: 'Mini-missione', body: `Le regioni del ${a} aspettano solo te. Un ripasso e vedrai che differenza!`, emoji: '🌍' },
+      { title: 'Hai quasi fatto', body: `Ti consiglio di rivedere il ${a}. Sei più brava di quanto pensi!`, emoji: '🔍' }
+    ]);
+  }
+
+  return pick([
+    { title: 'Continua a esercitarti', body: 'Riguarda le domande che hai sbagliato: ogni errore è un passo avanti!', emoji: '🌱' },
+    { title: 'Stai imparando tanto', body: 'Ripassa con calma le risposte sbagliate, sei sulla strada giusta!', emoji: '💪' },
+    { title: 'Un quiz alla volta', body: 'Riprova le domande difficili e vedrai i progressi quiz dopo quiz!', emoji: '🚀' }
+  ]);
+}
 
 // ============ PROFILES ============
 const DEFAULT_PROFILES = [
@@ -949,9 +1175,15 @@ const Store = {
   getProfile: () => localStorage.getItem('geo_profile'),
   setProfile: (p) => localStorage.setItem('geo_profile', p),
   getScores: (p) => JSON.parse(localStorage.getItem('geo_scores_' + p) || '[]'),
-  addScore: (p, score, total) => {
+  addScore: (p, score, total, errors, difficulty) => {
     const list = Store.getScores(p);
-    list.unshift({ date: Date.now(), score, total });
+    list.unshift({
+      date: Date.now(),
+      score,
+      total,
+      difficulty: difficulty || 'easy',
+      errors: errors || []
+    });
     if (list.length > 50) list.length = 50;
     localStorage.setItem('geo_scores_' + p, JSON.stringify(list));
   },
@@ -959,6 +1191,8 @@ const Store = {
   setSound: (on) => localStorage.setItem('geo_sound', on ? 'on' : 'off'),
   getLength: () => parseInt(localStorage.getItem('geo_length') || '10', 10),
   setLength: (n) => localStorage.setItem('geo_length', n),
+  getDifficulty: () => localStorage.getItem('geo_difficulty') || 'easy',
+  setDifficulty: (d) => localStorage.setItem('geo_difficulty', d === 'hard' ? 'hard' : 'easy'),
   getCustomProfiles: () => {
     try { return JSON.parse(localStorage.getItem('geo_profiles_custom') || '[]'); }
     catch { return []; }
@@ -1175,7 +1409,7 @@ const QUESTION_GENERATORS = {
   'identify': genQuestionIdentify
 };
 
-function buildQuiz(count) {
+function buildQuiz(count, difficulty) {
   const questions = [];
   const usedKeys = new Set();
   const types = ['capital', 'border-is', 'border-not', 'position', 'identify'];
@@ -1199,12 +1433,19 @@ function buildQuiz(count) {
     usedKeys.add(key);
     questions.push(genQuestionCapital(region));
   }
+  // Hard mode: capoluoghi e identify-region da scrivere
+  if (difficulty === 'hard') {
+    questions.forEach(q => {
+      if (q.type === 'capital') q.typed = true;
+    });
+  }
   return questions;
 }
 
 // ============ QUIZ FLOW ============
 function startQuiz() {
-  state.questions = buildQuiz(state.questionCount);
+  state.difficulty = Store.getDifficulty();
+  state.questions = buildQuiz(state.questionCount, state.difficulty);
   state.currentIndex = 0;
   state.answers = [];
   state.locked = false;
@@ -1237,13 +1478,31 @@ function renderQuestion() {
 
   const ans = $('#answers');
   ans.innerHTML = '';
-  q.choices.forEach(choice => {
-    const btn = document.createElement('button');
-    btn.className = 'answer-btn';
-    btn.textContent = choice;
-    btn.addEventListener('click', () => answerSelected(btn, choice));
-    ans.appendChild(btn);
-  });
+  $('#typed-area').classList.remove('active');
+  $('#typed-feedback').textContent = '';
+
+  if (q.typed) {
+    // Modalità difficile: input testuale
+    ans.style.display = 'none';
+    const ta = $('#typed-area');
+    ta.classList.add('active');
+    const input = $('#typed-input');
+    input.value = '';
+    input.disabled = false;
+    input.placeholder = 'Scrivi il capoluogo...';
+    $('#typed-submit').disabled = true;
+    $('#typed-submit').textContent = 'Conferma';
+    setTimeout(() => input.focus(), 100);
+  } else {
+    ans.style.display = '';
+    q.choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => answerSelected(btn, choice));
+      ans.appendChild(btn);
+    });
+  }
 }
 
 function answerSelected(btn, choice) {
@@ -1256,7 +1515,8 @@ function answerSelected(btn, choice) {
   state.answers.push({
     question: q,
     selected: choice,
-    correct: isCorrect
+    correct: isCorrect,
+    typed: false
   });
 
   // Highlight buttons
@@ -1285,6 +1545,49 @@ function answerSelected(btn, choice) {
       renderQuestion();
     }
   }, isCorrect ? 1100 : 1700);
+}
+
+function answerTyped() {
+  if (state.locked) return;
+  const input = $('#typed-input');
+  const userInput = (input.value || '').trim();
+  if (userInput.length < 2) return;
+  state.locked = true;
+
+  const q = state.questions[state.currentIndex];
+  const isCorrect = checkTypedAnswer(userInput, q.correct);
+
+  state.answers.push({
+    question: q,
+    selected: userInput,
+    correct: isCorrect,
+    typed: true
+  });
+
+  input.disabled = true;
+  const submit = $('#typed-submit');
+  submit.disabled = true;
+  const fb = $('#typed-feedback');
+  if (isCorrect) {
+    fb.className = 'typed-feedback ok';
+    fb.textContent = '✓ Esatto!';
+    Audio.correct();
+  } else {
+    fb.className = 'typed-feedback ko';
+    fb.innerHTML = '✗ La risposta giusta era: <strong>' + escapeHtml(q.correct) + '</strong>';
+    Audio.wrong();
+  }
+
+  $('#progress-fill').style.width = ((state.currentIndex + 1) / state.questionCount * 100) + '%';
+
+  setTimeout(() => {
+    state.currentIndex++;
+    if (state.currentIndex >= state.questions.length) {
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  }, isCorrect ? 1300 : 2200);
 }
 
 // ============ RESULT ============
@@ -1354,8 +1657,29 @@ function showResult() {
     });
   }
 
-  // Save score
-  Store.addScore(state.profile, correct, total);
+  // Save score with detailed errors
+  const errorsForStore = state.answers
+    .filter(a => !a.correct)
+    .map(a => ({
+      type: a.question.type,
+      region: a.question.region.id,
+      correct: a.question.correct,
+      selected: a.selected,
+      typed: !!a.typed
+    }));
+  Store.addScore(state.profile, correct, total, errorsForStore, state.difficulty || 'easy');
+
+  // Recommendation card based on history
+  const rec = getRecommendation(Store.getScores(state.profile));
+  const recCard = $('#recommendation-card');
+  if (rec) {
+    $('#rec-emoji').textContent = rec.emoji || '💡';
+    $('#rec-title').textContent = rec.title;
+    $('#rec-body').textContent = rec.body;
+    recCard.style.display = 'block';
+  } else {
+    recCard.style.display = 'none';
+  }
 
   showScreen('screen-result');
 }
@@ -1483,11 +1807,18 @@ function selectProfile(id) {
   Store.setProfile(id);
   const displayName = Store.getProfileName(id);
   $('#home-name').textContent = displayName;
-  // Restore length preference
+  // Restore preferences
   state.questionCount = Store.getLength();
   $$('#length-control button').forEach(b => {
     b.classList.toggle('active', parseInt(b.dataset.length, 10) === state.questionCount);
   });
+  state.difficulty = Store.getDifficulty();
+  $$('#difficulty-control button').forEach(b => {
+    b.classList.toggle('active', b.dataset.difficulty === state.difficulty);
+  });
+  $('#difficulty-hint').textContent = state.difficulty === 'hard'
+    ? 'I capoluoghi vanno scritti a mano (accenti e maiuscole non contano).'
+    : 'Tutto a scelta multipla.';
   $('#sound-toggle').checked = Store.getSound();
   renderStats();
   showScreen('screen-home');
@@ -1560,6 +1891,38 @@ function init() {
       $$('#length-control button').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
     });
+  });
+
+  // Difficulty selector
+  $$('#difficulty-control button').forEach(b => {
+    b.addEventListener('click', () => {
+      Audio.click();
+      const d = b.dataset.difficulty;
+      state.difficulty = d;
+      Store.setDifficulty(d);
+      $$('#difficulty-control button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      $('#difficulty-hint').textContent = d === 'hard'
+        ? 'I capoluoghi vanno scritti a mano (accenti e maiuscole non contano).'
+        : 'Tutto a scelta multipla.';
+    });
+  });
+
+  // Typed input handlers
+  const typedInput = $('#typed-input');
+  const typedSubmit = $('#typed-submit');
+  typedInput.addEventListener('input', e => {
+    typedSubmit.disabled = (e.target.value || '').trim().length < 2;
+  });
+  typedInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!typedSubmit.disabled) answerTyped();
+    }
+  });
+  typedSubmit.addEventListener('click', e => {
+    e.preventDefault();
+    answerTyped();
   });
 
   // Sound toggle

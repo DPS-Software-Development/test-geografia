@@ -4,6 +4,8 @@ italy_regions.geojson
 # Local dev/preview server config
 .claude/launch.json
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/
 
 # Hand-off notes (not meant for repo history)
 STATUS.md
