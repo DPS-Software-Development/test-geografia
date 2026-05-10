@@ -181,11 +181,107 @@ button {
   flex-shrink: 0;
   font-weight: 700;
 }
-.profile-btn[data-profile="emma"] .avatar { background: #f4d8a8; }
-.profile-btn[data-profile="sofia"] .avatar { background: #c5d9b8; }
+.profile-btn .name { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); display: block; }
+.profile-btn .sub { font-size: 0.85rem; color: var(--text-soft); margin-top: 2px; display: block; }
 
-.profile-btn .name { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); }
-.profile-btn .sub { font-size: 0.85rem; color: var(--text-soft); margin-top: 2px; }
+.profile-btn-add {
+  background: transparent;
+  border: 2px dashed rgba(58, 125, 138, 0.35);
+  box-shadow: none;
+}
+.profile-btn-add:hover {
+  background: rgba(58, 125, 138, 0.06);
+  transform: none;
+  box-shadow: none;
+}
+.profile-btn-add .avatar {
+  background: transparent !important;
+  border: 2px dashed rgba(58, 125, 138, 0.4);
+  color: var(--primary);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.profile-btn-add .name { color: var(--primary-dark); }
+
+/* ----- NEW NAME SCREEN ----- */
+#screen-newname .top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+#screen-newname .top-row .spacer { flex: 1; }
+
+.newname-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px 20px 22px;
+  margin-top: 18px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.newname-emoji {
+  font-size: 2.6rem;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.newname-card h2 {
+  margin-bottom: 8px;
+}
+
+.newname-card .hint {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+  line-height: 1.45;
+}
+
+#newname-input {
+  width: 100%;
+  font-size: 1.35rem;
+  padding: 16px 18px;
+  border: 2px solid rgba(58, 125, 138, 0.25);
+  border-radius: var(--radius-sm);
+  background: #fafafa;
+  color: var(--text);
+  font-family: inherit;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#newname-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(58, 125, 138, 0.12);
+}
+
+#newname-input::placeholder {
+  color: #b0bbb6;
+  font-weight: 400;
+}
+
+#newname-error {
+  color: var(--wrong);
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  min-height: 1.1em;
+}
+
+.btn-primary:disabled {
+  background: #c4cccc !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  color: #f0f4f4;
+}
+.btn-primary:disabled:active { transform: none; }
 
 /* ----- HOME SCREEN ----- */
 #screen-home .top-bar {
@@ -657,21 +753,34 @@ template { display: none; }
       <h1>Test di Geografia</h1>
       <p class="tagline">Le regioni d'Italia</p>
     </div>
-    <div class="profile-buttons">
-      <button class="profile-btn" data-profile="emma">
-        <span class="avatar">E</span>
-        <span>
-          <span class="name">Emma</span>
-          <span class="sub" data-stats-line="emma">Tocca per giocare</span>
-        </span>
-      </button>
-      <button class="profile-btn" data-profile="sofia">
-        <span class="avatar">S</span>
-        <span>
-          <span class="name">Sofia</span>
-          <span class="sub" data-stats-line="sofia">Tocca per giocare</span>
-        </span>
-      </button>
+    <div class="profile-buttons" id="profile-buttons">
+      <!-- Rendered dynamically by renderProfileButtons() -->
+    </div>
+  </section>
+
+  <!-- ============ NEW NAME SCREEN ============ -->
+  <section id="screen-newname" class="screen">
+    <div class="top-row">
+      <button class="btn-icon" id="btn-back-newname" aria-label="Indietro">←</button>
+      <span class="spacer"></span>
+    </div>
+
+    <div class="newname-card">
+      <div class="newname-emoji" aria-hidden="true">✨</div>
+      <h2>Come ti chiami?</h2>
+      <p class="hint">Il tuo nome viene salvato solo su questo cellulare. I tuoi punteggi resteranno qui per quando ricarichi la pagina.</p>
+
+      <input type="text" id="newname-input"
+        placeholder="Il tuo nome"
+        maxlength="25"
+        autocomplete="off"
+        autocapitalize="words"
+        spellcheck="false"
+        aria-label="Il tuo nome">
+
+      <div id="newname-error" role="alert" aria-live="polite"></div>
+
+      <button class="btn-primary" id="newname-submit" disabled>Inizia il quiz →</button>
     </div>
   </section>
 
@@ -805,6 +914,36 @@ const state = {
   locked: false
 };
 
+// ============ PROFILES ============
+const DEFAULT_PROFILES = [
+  { id: 'emma', name: 'Emma' },
+  { id: 'sofia', name: 'Sofia' }
+];
+
+const AVATAR_COLORS = ['#f4d8a8', '#c5d9b8', '#f4b8b8', '#b8d9e0', '#e0c8e8', '#d9d2b8', '#f0c4a4', '#b8e0c8'];
+
+function slugify(name) {
+  const accents = {
+    'à':'a','á':'a','â':'a','ã':'a','ä':'a','å':'a',
+    'è':'e','é':'e','ê':'e','ë':'e',
+    'ì':'i','í':'i','î':'i','ï':'i',
+    'ò':'o','ó':'o','ô':'o','õ':'o','ö':'o',
+    'ù':'u','ú':'u','û':'u','ü':'u',
+    'ñ':'n','ç':'c','ý':'y','ÿ':'y'
+  };
+  return String(name || '').toLowerCase()
+    .split('').map(ch => accents[ch] || ch).join('')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 30);
+}
+
+function profileColor(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+
 // ============ STORAGE ============
 const Store = {
   getProfile: () => localStorage.getItem('geo_profile'),
@@ -819,7 +958,29 @@ const Store = {
   getSound: () => localStorage.getItem('geo_sound') === 'on',
   setSound: (on) => localStorage.setItem('geo_sound', on ? 'on' : 'off'),
   getLength: () => parseInt(localStorage.getItem('geo_length') || '10', 10),
-  setLength: (n) => localStorage.setItem('geo_length', n)
+  setLength: (n) => localStorage.setItem('geo_length', n),
+  getCustomProfiles: () => {
+    try { return JSON.parse(localStorage.getItem('geo_profiles_custom') || '[]'); }
+    catch { return []; }
+  },
+  addCustomProfile: (rawName) => {
+    const name = String(rawName || '').trim().slice(0, 30);
+    if (!name) return null;
+    const id = slugify(name);
+    if (!id || id.length < 2) return null;
+    const all = Store.getAllProfiles();
+    const existing = all.find(p => p.id === id);
+    if (existing) return existing.id;
+    const customs = Store.getCustomProfiles();
+    customs.push({ id, name });
+    localStorage.setItem('geo_profiles_custom', JSON.stringify(customs));
+    return id;
+  },
+  getAllProfiles: () => [...DEFAULT_PROFILES, ...Store.getCustomProfiles()],
+  getProfileName: (id) => {
+    const p = Store.getAllProfiles().find(x => x.id === id);
+    return p ? p.name : (id || '');
+  }
 };
 
 // ============ AUDIO ============
@@ -1259,28 +1420,72 @@ function renderStats() {
   }).join('');
 }
 
-function renderProfileStats() {
-  ['emma', 'sofia'].forEach(p => {
-    const scores = Store.getScores(p);
-    const sub = $(`[data-stats-line="${p}"]`);
-    if (!sub) return;
-    if (scores.length === 0) {
-      sub.textContent = 'Tocca per giocare';
-    } else {
-      const best = Math.max(...scores.map(s => Math.round(s.score / s.total * 100)));
-      sub.textContent = `${scores.length} partite — migliore ${best}%`;
-    }
+function profileSubtext(id) {
+  const scores = Store.getScores(id);
+  if (scores.length === 0) return 'Tocca per giocare';
+  const best = Math.max(...scores.map(s => Math.round(s.score / s.total * 100)));
+  const word = scores.length === 1 ? 'partita' : 'partite';
+  return `${scores.length} ${word} — migliore ${best}%`;
+}
+
+function renderProfileButtons() {
+  const container = $('#profile-buttons');
+  container.innerHTML = '';
+
+  Store.getAllProfiles().forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'profile-btn';
+    btn.dataset.profile = p.id;
+    btn.type = 'button';
+    const initial = (p.name[0] || '?').toUpperCase();
+    btn.innerHTML =
+      '<span class="avatar" style="background:' + profileColor(p.id) + '">' + escapeHtml(initial) + '</span>' +
+      '<span>' +
+        '<span class="name">' + escapeHtml(p.name) + '</span>' +
+        '<span class="sub">' + escapeHtml(profileSubtext(p.id)) + '</span>' +
+      '</span>';
+    btn.addEventListener('click', () => {
+      Audio.click();
+      selectProfile(p.id);
+    });
+    container.appendChild(btn);
   });
+
+  // Add "+ New player" button
+  const addBtn = document.createElement('button');
+  addBtn.className = 'profile-btn profile-btn-add';
+  addBtn.id = 'btn-new-profile';
+  addBtn.type = 'button';
+  addBtn.innerHTML =
+    '<span class="avatar">+</span>' +
+    '<span>' +
+      '<span class="name">Nuovo giocatore</span>' +
+      '<span class="sub">Inserisci il tuo nome per giocare</span>' +
+    '</span>';
+  addBtn.addEventListener('click', () => {
+    Audio.click();
+    showNewNameScreen();
+  });
+  container.appendChild(addBtn);
+}
+
+function showNewNameScreen() {
+  $('#newname-input').value = '';
+  $('#newname-error').textContent = '';
+  $('#newname-submit').disabled = true;
+  showScreen('screen-newname');
+  setTimeout(() => $('#newname-input').focus(), 250);
 }
 
 // ============ EVENT WIRING ============
-function selectProfile(name) {
-  state.profile = name;
-  Store.setProfile(name);
-  $('#home-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+function selectProfile(id) {
+  state.profile = id;
+  Store.setProfile(id);
+  const displayName = Store.getProfileName(id);
+  $('#home-name').textContent = displayName;
   // Restore length preference
   state.questionCount = Store.getLength();
-  $$('.seg-control button').forEach(b => {
+  $$('#length-control button').forEach(b => {
     b.classList.toggle('active', parseInt(b.dataset.length, 10) === state.questionCount);
   });
   $('#sound-toggle').checked = Store.getSound();
@@ -1288,20 +1493,61 @@ function selectProfile(name) {
   showScreen('screen-home');
 }
 
+function trySubmitNewName() {
+  const raw = $('#newname-input').value.trim();
+  const errEl = $('#newname-error');
+  if (raw.length < 2) {
+    errEl.textContent = 'Scrivi almeno 2 lettere.';
+    return;
+  }
+  const slug = slugify(raw);
+  if (!slug || slug.length < 2) {
+    errEl.textContent = 'Usa lettere o numeri (gli accenti vanno bene).';
+    return;
+  }
+  errEl.textContent = '';
+  const id = Store.addCustomProfile(raw);
+  if (!id) {
+    errEl.textContent = 'Nome non valido. Riprova.';
+    return;
+  }
+  Audio.click();
+  selectProfile(id);
+}
+
 function init() {
-  // Profile buttons
-  $$('.profile-btn').forEach(b => {
-    b.addEventListener('click', () => {
-      Audio.click();
-      selectProfile(b.dataset.profile);
-    });
-  });
+  // Render profile buttons dynamically (Emma, Sofia, custom profiles, + add)
+  renderProfileButtons();
 
   // Change profile
   $('#btn-change-profile').addEventListener('click', () => {
     Audio.click();
-    renderProfileStats();
+    renderProfileButtons();
     showScreen('screen-profile');
+  });
+
+  // New name screen
+  $('#btn-back-newname').addEventListener('click', () => {
+    Audio.click();
+    showScreen('screen-profile');
+  });
+
+  $('#newname-input').addEventListener('input', e => {
+    const v = e.target.value.trim();
+    $('#newname-submit').disabled = v.length < 2;
+    if (v.length >= 2) $('#newname-error').textContent = '';
+  });
+
+  $('#newname-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!$('#newname-submit').disabled) trySubmitNewName();
+    }
+  });
+
+  $('#newname-submit').addEventListener('click', e => {
+    e.preventDefault();
+    trySubmitNewName();
   });
 
   // Length selector
@@ -1349,10 +1595,10 @@ function init() {
     showScreen('screen-home');
   });
 
-  // Restore profile if present
+  // Restore profile if present and still valid
   const savedProfile = Store.getProfile();
-  renderProfileStats();
-  if (savedProfile && (savedProfile === 'emma' || savedProfile === 'sofia')) {
+  const validIds = Store.getAllProfiles().map(p => p.id);
+  if (savedProfile && validIds.includes(savedProfile)) {
     selectProfile(savedProfile);
   } else {
     showScreen('screen-profile');
