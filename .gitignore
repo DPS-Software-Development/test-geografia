@@ -1,0 +1,16 @@
+# Build source data (re-downloadable from openpolis/geojson-italy)
+italy_regions.geojson
+
+# Local dev/preview server config
+.claude/launch.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Node
+node_modules/

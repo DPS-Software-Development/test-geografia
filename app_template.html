@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#3a7d8a">
+<title>Test di Geografia — Regioni Italiane</title>
+<style>
+:root {
+  --bg: #f4f1e8;
+  --card: #ffffff;
+  --primary: #3a7d8a;
+  --primary-dark: #2c5f6b;
+  --coral: #e8775e;
+  --coral-dark: #c95a44;
+  --olive: #7a8b3f;
+  --sage: #a8c5b0;
+  --sand: #efe4cc;
+  --text: #2c3e3a;
+  --text-soft: #5a6f6b;
+  --correct: #5fa860;
+  --wrong: #d9534f;
+  --map-fill: #d8e3c4;
+  --map-stroke: #6a7a4a;
+  --map-highlight: #f4b860;
+  --shadow: 0 4px 12px rgba(58, 125, 138, 0.12);
+  --shadow-lg: 0 8px 24px rgba(58, 125, 138, 0.18);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+  background: linear-gradient(180deg, #f4f1e8 0%, #e8eee0 100%);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: 1.4;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+#app {
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+
+.screen {
+  display: none;
+  padding: 20px 18px 30px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+}
+
+.screen.active { display: flex; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ----- TYPOGRAPHY ----- */
+h1, h2, h3 { color: var(--primary-dark); font-weight: 700; }
+h1 { font-size: 1.85rem; line-height: 1.15; letter-spacing: -0.5px; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.1rem; }
+
+/* ----- BUTTONS ----- */
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+.btn-primary, .btn-secondary {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1.05rem;
+  transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
+  letter-spacing: 0.2px;
+}
+
+.btn-primary {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: var(--shadow);
+}
+.btn-primary:hover { background: var(--coral-dark); }
+.btn-primary:active { transform: scale(0.98); box-shadow: var(--shadow); }
+
+.btn-secondary {
+  background: var(--card);
+  color: var(--primary-dark);
+  border: 2px solid var(--primary);
+}
+.btn-secondary:hover { background: rgba(58, 125, 138, 0.08); }
+.btn-secondary:active { transform: scale(0.98); }
+
+.btn-icon {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--card);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--primary-dark);
+  box-shadow: var(--shadow);
+  transition: transform 0.1s;
+  flex-shrink: 0;
+}
+.btn-icon:active { transform: scale(0.92); }
+
+/* ----- PROFILE SCREEN ----- */
+#screen-profile {
+  justify-content: center;
+  text-align: center;
+  gap: 28px;
+  padding-top: 60px;
+}
+
+#screen-profile .logo {
+  display: flex;
+  justify-content: center;
+}
+#screen-profile .logo svg {
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(58, 125, 138, 0.2);
+}
+
+#screen-profile h1 { color: var(--primary-dark); }
+#screen-profile .tagline { color: var(--text-soft); font-size: 1.05rem; }
+
+.profile-buttons {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.profile-btn {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s, box-shadow 0.2s;
+  text-align: left;
+  width: 100%;
+}
+.profile-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.profile-btn:active { transform: scale(0.98); }
+
+.profile-btn .avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--sage);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: var(--primary-dark);
+  flex-shrink: 0;
+  font-weight: 700;
+}
+.profile-btn[data-profile="emma"] .avatar { background: #f4d8a8; }
+.profile-btn[data-profile="sofia"] .avatar { background: #c5d9b8; }
+
+.profile-btn .name { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); }
+.profile-btn .sub { font-size: 0.85rem; color: var(--text-soft); margin-top: 2px; }
+
+/* ----- HOME SCREEN ----- */
+#screen-home .top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+#screen-home .greeting {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+#screen-home h2 {
+  margin-bottom: 22px;
+}
+
+.config-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+.config-card .label {
+  font-size: 0.95rem;
+  color: var(--text-soft);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.seg-control {
+  display: flex;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.seg-control button {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 7px;
+  font-weight: 700;
+  color: var(--text-soft);
+  transition: background 0.2s, color 0.2s;
+}
+
+.seg-control button.active {
+  background: var(--card);
+  color: var(--primary-dark);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch input { display: none; }
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #c8c8c8;
+  border-radius: 28px;
+  transition: 0.2s;
+}
+
+.switch .slider::before {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  transition: 0.2s;
+}
+
+.switch input:checked + .slider { background: var(--olive); }
+.switch input:checked + .slider::before { transform: translateX(22px); }
+
+#btn-start {
+  margin-top: 6px;
+  margin-bottom: 22px;
+}
+
+.stats-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.stats-card h3 { margin-bottom: 12px; }
+
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-item .num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--coral);
+}
+.stat-item .label {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+}
+
+.history-list .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.history-list .row:first-child { border-top: none; }
+.history-list .empty { text-align: center; padding: 8px 0; }
+
+/* ----- QUIZ SCREEN ----- */
+#screen-quiz .quiz-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.progress-wrap {
+  flex: 1;
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: rgba(58, 125, 138, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--coral);
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.question-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.question-text {
+  font-size: 1.15rem;
+  color: var(--primary-dark);
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 14px;
+}
+
+.question-map {
+  margin: 14px auto 6px;
+  max-width: 280px;
+  width: 100%;
+  display: none;
+}
+
+.question-map.active { display: block; }
+
+.question-map svg {
+  width: 100%;
+  height: auto;
+  max-height: 240px;
+}
+
+.answers {
+  display: grid;
+  gap: 10px;
+}
+
+.answer-btn {
+  background: var(--card);
+  border: 2px solid rgba(58, 125, 138, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  text-align: left;
+  transition: all 0.18s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.answer-btn:hover {
+  border-color: var(--primary);
+  background: rgba(58, 125, 138, 0.04);
+}
+
+.answer-btn:active { transform: scale(0.98); }
+
+.answer-btn.correct {
+  background: var(--correct);
+  border-color: var(--correct);
+  color: white;
+  animation: bounce 0.4s;
+}
+
+.answer-btn.wrong {
+  background: var(--wrong);
+  border-color: var(--wrong);
+  color: white;
+  animation: shake 0.4s;
+}
+
+.answer-btn.show-correct {
+  background: var(--correct);
+  border-color: var(--correct);
+  color: white;
+}
+
+.answer-btn.disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.06); }
+  60% { transform: scale(0.98); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+/* ----- MAP STYLES ----- */
+.italy-map {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.italy-map .region {
+  fill: var(--map-fill);
+  stroke: var(--map-stroke);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  transition: fill 0.25s;
+}
+
+.italy-map .region.highlighted {
+  fill: var(--map-highlight);
+  stroke-width: 1.3;
+}
+
+.italy-map .region.r-correct {
+  fill: var(--correct);
+  stroke: #3d7a3e;
+}
+
+.italy-map .region.r-wrong {
+  fill: var(--wrong);
+  stroke: #a13a37;
+}
+
+/* ----- RESULT SCREEN ----- */
+#screen-result {
+  text-align: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-emoji {
+  font-size: 3.5rem;
+  margin-top: 14px;
+  margin-bottom: -4px;
+  animation: pop 0.6s cubic-bezier(.2, 1.4, .4, 1);
+}
+
+@keyframes pop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.result-title {
+  margin: 4px 0 4px;
+}
+
+.result-score {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--coral);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.result-message {
+  color: var(--text-soft);
+  margin-bottom: 18px;
+  padding: 0 6px;
+}
+
+.result-map {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 18px;
+}
+
+.mistakes-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.mistakes-card h3 { margin-bottom: 10px; font-size: 1rem; }
+
+.mistake-item {
+  padding: 10px 0;
+  border-top: 1px solid rgba(0,0,0,0.07);
+  font-size: 0.92rem;
+}
+.mistake-item:first-child { border-top: none; padding-top: 0; }
+
+.mistake-q {
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.mistake-a {
+  color: var(--text-soft);
+  font-size: 0.86rem;
+}
+
+.mistake-a .right {
+  color: var(--correct);
+  font-weight: 700;
+}
+.mistake-a .your {
+  color: var(--wrong);
+  text-decoration: line-through;
+}
+
+.result-actions {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+/* ----- CONFETTI ----- */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 14px;
+  top: -20px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* ----- RESPONSIVE: TABLET / DESKTOP ----- */
+@media (min-width: 700px) {
+  .screen { padding: 30px 28px 40px; }
+  h1 { font-size: 2.2rem; }
+  .question-map { max-width: 340px; }
+  .question-map svg { max-height: 320px; }
+  .result-map { max-width: 400px; }
+}
+
+/* Hide template */
+template { display: none; }
+
+/* Toast (e.g. for "stai uscendo dal quiz") */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary-dark);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 200;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<main id="app">
+  <!-- ============ PROFILE SELECTION ============ -->
+  <section id="screen-profile" class="screen active">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 60 40" width="68" height="46" role="img" aria-label="Bandiera italiana">
+        <rect x="0" y="0" width="20" height="40" fill="#5fa860"/>
+        <rect x="20" y="0" width="20" height="40" fill="#fafaf2"/>
+        <rect x="40" y="0" width="20" height="40" fill="#e8775e"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Test di Geografia</h1>
+      <p class="tagline">Le regioni d'Italia</p>
+    </div>
+    <div class="profile-buttons">
+      <button class="profile-btn" data-profile="emma">
+        <span class="avatar">E</span>
+        <span>
+          <span class="name">Emma</span>
+          <span class="sub" data-stats-line="emma">Tocca per giocare</span>
+        </span>
+      </button>
+      <button class="profile-btn" data-profile="sofia">
+        <span class="avatar">S</span>
+        <span>
+          <span class="name">Sofia</span>
+          <span class="sub" data-stats-line="sofia">Tocca per giocare</span>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ HOME ============ -->
+  <section id="screen-home" class="screen">
+    <div class="top-bar">
+      <span class="greeting">Ciao <span id="home-name">Emma</span>! 👋</span>
+      <button class="btn-icon" id="btn-change-profile" aria-label="Cambia profilo">⇄</button>
+    </div>
+
+    <h2>Pronta per il quiz?</h2>
+
+    <div class="config-card">
+      <div class="label">Numero di domande</div>
+      <div class="seg-control" id="length-control">
+        <button data-length="5">5</button>
+        <button data-length="10" class="active">10</button>
+        <button data-length="15">15</button>
+      </div>
+    </div>
+
+    <div class="config-card">
+      <div class="toggle-row">
+        <span class="label" style="margin: 0;">🔊 Suoni</span>
+        <label class="switch">
+          <input type="checkbox" id="sound-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-start">▶  Inizia il quiz</button>
+
+    <div class="stats-card">
+      <h3>I tuoi progressi</h3>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-bar">
+      <div class="progress-wrap">
+        <div class="progress-text"><span id="q-num">1</span> di <span id="q-total">10</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+      <button class="btn-icon" id="btn-quit" aria-label="Esci">✕</button>
+    </div>
+
+    <div class="question-card">
+      <h3 class="question-text" id="question-text"></h3>
+      <div class="question-map" id="question-map"></div>
+      <div class="answers" id="answers"></div>
+    </div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section id="screen-result" class="screen">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <h2 class="result-title" id="result-title">Bravissima!</h2>
+    <div class="result-score" id="result-score">10 / 10</div>
+    <p class="result-message" id="result-message"></p>
+
+    <div class="result-map" id="result-map"></div>
+
+    <div class="mistakes-card" id="mistakes-card" style="display:none;">
+      <h3>Da rivedere</h3>
+      <div id="mistakes-list"></div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-primary" id="btn-retry">↻  Rigioca</button>
+      <button class="btn-secondary" id="btn-home">Torna alla home</button>
+    </div>
+    <div class="confetti-container" id="confetti"></div>
+  </section>
+
+  <!-- Italy SVG template (cloned where needed) -->
+  <template id="italy-svg">
+<!-- INLINE_SVG -->
+  </template>
+
+  <div class="toast" id="toast"></div>
+</main>
+
+<script>
+'use strict';
+
+// ============ DATA ============
+const REGIONS = [
+  { id:'piemonte', name:'Piemonte', capital:'Torino', position:'nord-ovest', borders:['valle-d-aosta','lombardia','liguria','emilia-romagna'] },
+  { id:'valle-d-aosta', name:"Valle d'Aosta", capital:'Aosta', position:'nord-ovest', borders:['piemonte'] },
+  { id:'lombardia', name:'Lombardia', capital:'Milano', position:'nord-ovest', borders:['piemonte','trentino-alto-adige','veneto','emilia-romagna'] },
+  { id:'liguria', name:'Liguria', capital:'Genova', position:'nord-ovest', borders:['piemonte','emilia-romagna','toscana'] },
+  { id:'trentino-alto-adige', name:'Trentino-Alto Adige', capital:'Trento', position:'nord-est', borders:['lombardia','veneto'] },
+  { id:'veneto', name:'Veneto', capital:'Venezia', position:'nord-est', borders:['lombardia','trentino-alto-adige','friuli-venezia-giulia','emilia-romagna'] },
+  { id:'friuli-venezia-giulia', name:'Friuli-Venezia Giulia', capital:'Trieste', position:'nord-est', borders:['veneto'] },
+  { id:'emilia-romagna', name:'Emilia-Romagna', capital:'Bologna', position:'nord-est', borders:['lombardia','veneto','marche','toscana','liguria'] },
+  { id:'toscana', name:'Toscana', capital:'Firenze', position:'centro', borders:['liguria','emilia-romagna','marche','umbria','lazio'] },
+  { id:'umbria', name:'Umbria', capital:'Perugia', position:'centro', borders:['toscana','marche','lazio'] },
+  { id:'marche', name:'Marche', capital:'Ancona', position:'centro', borders:['emilia-romagna','toscana','umbria','lazio','abruzzo'] },
+  { id:'lazio', name:'Lazio', capital:'Roma', position:'centro', borders:['toscana','umbria','marche','abruzzo','molise','campania'] },
+  { id:'abruzzo', name:'Abruzzo', capital:"L'Aquila", position:'sud', borders:['marche','lazio','molise'] },
+  { id:'molise', name:'Molise', capital:'Campobasso', position:'sud', borders:['abruzzo','lazio','campania','puglia'] },
+  { id:'campania', name:'Campania', capital:'Napoli', position:'sud', borders:['lazio','molise','puglia','basilicata'] },
+  { id:'puglia', name:'Puglia', capital:'Bari', position:'sud', borders:['molise','campania','basilicata'] },
+  { id:'basilicata', name:'Basilicata', capital:'Potenza', position:'sud', borders:['campania','puglia','calabria'] },
+  { id:'calabria', name:'Calabria', capital:'Catanzaro', position:'sud', borders:['basilicata'] },
+  { id:'sicilia', name:'Sicilia', capital:'Palermo', position:'isole', borders:[] },
+  { id:'sardegna', name:'Sardegna', capital:'Cagliari', position:'isole', borders:[] }
+];
+
+const POSITION_LABEL = {
+  'nord-ovest': 'Nord-Ovest',
+  'nord-est': 'Nord-Est',
+  'centro': 'Centro',
+  'sud': 'Sud',
+  'isole': 'Isole'
+};
+
+const REGION_BY_ID = Object.fromEntries(REGIONS.map(r => [r.id, r]));
+
+// ============ STATE ============
+const state = {
+  profile: null,
+  questionCount: 10,
+  questions: [],
+  currentIndex: 0,
+  answers: [],
+  locked: false
+};
+
+// ============ STORAGE ============
+const Store = {
+  getProfile: () => localStorage.getItem('geo_profile'),
+  setProfile: (p) => localStorage.setItem('geo_profile', p),
+  getScores: (p) => JSON.parse(localStorage.getItem('geo_scores_' + p) || '[]'),
+  addScore: (p, score, total) => {
+    const list = Store.getScores(p);
+    list.unshift({ date: Date.now(), score, total });
+    if (list.length > 50) list.length = 50;
+    localStorage.setItem('geo_scores_' + p, JSON.stringify(list));
+  },
+  getSound: () => localStorage.getItem('geo_sound') === 'on',
+  setSound: (on) => localStorage.setItem('geo_sound', on ? 'on' : 'off'),
+  getLength: () => parseInt(localStorage.getItem('geo_length') || '10', 10),
+  setLength: (n) => localStorage.setItem('geo_length', n)
+};
+
+// ============ AUDIO ============
+const Audio = (() => {
+  let ctx = null;
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return ctx;
+  }
+  function tone(freq, duration, type, volume, when) {
+    if (!Store.getSound()) return;
+    try {
+      const c = getCtx();
+      const startAt = c.currentTime + (when || 0);
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(volume || 0.18, startAt);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+      osc.connect(gain).connect(c.destination);
+      osc.start(startAt);
+      osc.stop(startAt + duration + 0.05);
+    } catch (e) { /* ignore */ }
+  }
+  return {
+    correct() { tone(659, 0.12, 'sine', 0.18, 0); tone(880, 0.18, 'sine', 0.18, 0.10); },
+    wrong()   { tone(220, 0.20, 'triangle', 0.16, 0); tone(180, 0.20, 'triangle', 0.14, 0.08); },
+    win()     { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.18, 'sine', 0.20, i * 0.10)); },
+    click()   { tone(720, 0.04, 'sine', 0.06, 0); }
+  };
+})();
+
+// ============ HELPERS ============
+function $(sel, root) { return (root || document).querySelector(sel); }
+function $$(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function pickN(arr, n) { return shuffle(arr).slice(0, n); }
+
+function showScreen(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  $('#' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showToast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function getMapClone() {
+  const tpl = $('#italy-svg');
+  const wrap = document.createElement('div');
+  wrap.appendChild(tpl.content.cloneNode(true));
+  return wrap.querySelector('svg');
+}
+
+// ============ QUESTION GENERATION ============
+function genQuestionCapital(region) {
+  const wrong = REGIONS.filter(r => r.id !== region.id).map(r => r.capital);
+  const choices = shuffle([region.capital, ...pickN(wrong, 3)]);
+  return {
+    type: 'capital',
+    text: `Qual è il capoluogo ${region.id === 'lazio' || region.id.startsWith('p') || region.id === 'molise' || region.id === 'veneto' || region.id === 'trentino-alto-adige' || region.id === 'friuli-venezia-giulia' || region.id === 'abruzzo' ? 'del' : 'della'} ${region.name}?`,
+    showMap: false,
+    correct: region.capital,
+    choices,
+    region: region
+  };
+}
+
+function genQuestionBorderIs(region) {
+  if (region.borders.length === 0) return null;
+  const correctId = pick(region.borders);
+  const nonNeighborIds = REGIONS.filter(r => r.id !== region.id && !region.borders.includes(r.id)).map(r => r.id);
+  if (nonNeighborIds.length < 3) return null;
+  const wrongIds = pickN(nonNeighborIds, 3);
+  const choices = shuffle([correctId, ...wrongIds].map(id => REGION_BY_ID[id].name));
+  return {
+    type: 'border-is',
+    text: `Quale di queste regioni confina con ${prep(region)}${region.name}?`,
+    showMap: true,
+    mapHighlight: region.id,
+    correct: REGION_BY_ID[correctId].name,
+    choices,
+    region: region
+  };
+}
+
+function genQuestionBorderNot(region) {
+  if (region.borders.length < 3) return null;
+  const wrongIds = pickN(region.borders, 3);
+  const nonNeighborIds = REGIONS.filter(r => r.id !== region.id && !region.borders.includes(r.id)).map(r => r.id);
+  if (nonNeighborIds.length === 0) return null;
+  const correctId = pick(nonNeighborIds);
+  const choices = shuffle([correctId, ...wrongIds].map(id => REGION_BY_ID[id].name));
+  return {
+    type: 'border-not',
+    text: `Quale di queste regioni NON confina con ${prep(region)}${region.name}?`,
+    showMap: true,
+    mapHighlight: region.id,
+    correct: REGION_BY_ID[correctId].name,
+    choices,
+    region: region
+  };
+}
+
+function genQuestionPosition(region) {
+  const correct = region.position;
+  const others = ['nord-ovest','nord-est','centro','sud','isole'].filter(p => p !== correct);
+  const wrong = pickN(others, 3);
+  const choices = shuffle([correct, ...wrong]).map(p => POSITION_LABEL[p]);
+  return {
+    type: 'position',
+    text: `In quale parte d'Italia si trova ${prep(region)}${region.name}?`,
+    showMap: true,
+    mapHighlight: region.id,
+    correct: POSITION_LABEL[correct],
+    choices,
+    region: region
+  };
+}
+
+function genQuestionIdentify(region) {
+  const wrongIds = pickN(REGIONS.filter(r => r.id !== region.id).map(r => r.id), 3);
+  const choices = shuffle([region.id, ...wrongIds].map(id => REGION_BY_ID[id].name));
+  return {
+    type: 'identify',
+    text: 'Quale regione è evidenziata sulla mappa?',
+    showMap: true,
+    mapHighlight: region.id,
+    correct: region.name,
+    choices,
+    region: region
+  };
+}
+
+// "del/della" preposition based on region name
+function prep(region) {
+  // Maschile: il Piemonte, il Veneto, il Lazio, l'Abruzzo, il Molise, il Trentino-Alto Adige, il Friuli-Venezia Giulia
+  // Femminile: la Lombardia, la Liguria, la Toscana, l'Umbria, le Marche, la Campania, la Puglia, la Basilicata, la Calabria, la Sicilia, la Sardegna, l'Emilia-Romagna, la Valle d'Aosta
+  const masc = ['piemonte','veneto','lazio','abruzzo','molise','trentino-alto-adige','friuli-venezia-giulia'];
+  const apostrofo = ['abruzzo','umbria','emilia-romagna'];
+  if (region.id === 'marche') return 'le ';
+  if (apostrofo.includes(region.id)) return masc.includes(region.id) ? "l'" : "l'";
+  if (masc.includes(region.id)) return 'il ';
+  return 'la ';
+}
+
+function genCapitalText(region) {
+  // Articolo "del/della" davanti al nome regione per "qual è il capoluogo del..."
+  const masc = ['piemonte','veneto','lazio','molise','trentino-alto-adige','friuli-venezia-giulia'];
+  const apost = ['abruzzo','umbria','emilia-romagna'];
+  if (region.id === 'marche') return 'Qual è il capoluogo delle Marche?';
+  if (apost.includes(region.id)) return `Qual è il capoluogo dell'${region.name}?`;
+  if (masc.includes(region.id)) return `Qual è il capoluogo del ${region.name}?`;
+  return `Qual è il capoluogo della ${region.name}?`;
+}
+
+// Override capital text generator using clean function
+function genQuestionCapital(region) {
+  const wrong = REGIONS.filter(r => r.id !== region.id).map(r => r.capital);
+  const choices = shuffle([region.capital, ...pickN(wrong, 3)]);
+  return {
+    type: 'capital',
+    text: genCapitalText(region),
+    showMap: false,
+    correct: region.capital,
+    choices,
+    region: region
+  };
+}
+
+const QUESTION_GENERATORS = {
+  'capital': genQuestionCapital,
+  'border-is': genQuestionBorderIs,
+  'border-not': genQuestionBorderNot,
+  'position': genQuestionPosition,
+  'identify': genQuestionIdentify
+};
+
+function buildQuiz(count) {
+  const questions = [];
+  const usedKeys = new Set();
+  const types = ['capital', 'border-is', 'border-not', 'position', 'identify'];
+  let attempts = 0;
+  while (questions.length < count && attempts < 200) {
+    attempts++;
+    const type = pick(types);
+    const region = pick(REGIONS);
+    const key = type + ':' + region.id;
+    if (usedKeys.has(key)) continue;
+    const q = QUESTION_GENERATORS[type](region);
+    if (!q) continue;
+    usedKeys.add(key);
+    questions.push(q);
+  }
+  // Fallback: if we hit cap, fill remaining with capital questions (always available)
+  while (questions.length < count) {
+    const region = pick(REGIONS);
+    const key = 'capital:' + region.id;
+    if (usedKeys.has(key)) continue;
+    usedKeys.add(key);
+    questions.push(genQuestionCapital(region));
+  }
+  return questions;
+}
+
+// ============ QUIZ FLOW ============
+function startQuiz() {
+  state.questions = buildQuiz(state.questionCount);
+  state.currentIndex = 0;
+  state.answers = [];
+  state.locked = false;
+  $('#q-total').textContent = state.questionCount;
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = state.questions[state.currentIndex];
+  state.locked = false;
+
+  $('#q-num').textContent = state.currentIndex + 1;
+  $('#progress-fill').style.width = ((state.currentIndex) / state.questionCount * 100) + '%';
+  $('#question-text').textContent = q.text;
+
+  const mapWrap = $('#question-map');
+  mapWrap.innerHTML = '';
+  if (q.showMap) {
+    mapWrap.classList.add('active');
+    const svg = getMapClone();
+    if (q.mapHighlight) {
+      const el = svg.querySelector('#r-' + q.mapHighlight);
+      if (el) el.classList.add('highlighted');
+    }
+    mapWrap.appendChild(svg);
+  } else {
+    mapWrap.classList.remove('active');
+  }
+
+  const ans = $('#answers');
+  ans.innerHTML = '';
+  q.choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = choice;
+    btn.addEventListener('click', () => answerSelected(btn, choice));
+    ans.appendChild(btn);
+  });
+}
+
+function answerSelected(btn, choice) {
+  if (state.locked) return;
+  state.locked = true;
+
+  const q = state.questions[state.currentIndex];
+  const isCorrect = choice === q.correct;
+
+  state.answers.push({
+    question: q,
+    selected: choice,
+    correct: isCorrect
+  });
+
+  // Highlight buttons
+  $$('#answers .answer-btn').forEach(b => {
+    b.classList.add('disabled');
+    if (b.textContent === q.correct) {
+      if (isCorrect && b === btn) b.classList.add('correct');
+      else b.classList.add('show-correct');
+    } else if (b === btn) {
+      b.classList.add('wrong');
+    }
+  });
+
+  if (isCorrect) Audio.correct();
+  else Audio.wrong();
+
+  // Update progress fill to include this question
+  $('#progress-fill').style.width = ((state.currentIndex + 1) / state.questionCount * 100) + '%';
+
+  // Auto-advance
+  setTimeout(() => {
+    state.currentIndex++;
+    if (state.currentIndex >= state.questions.length) {
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  }, isCorrect ? 1100 : 1700);
+}
+
+// ============ RESULT ============
+function showResult() {
+  const correct = state.answers.filter(a => a.correct).length;
+  const total = state.answers.length;
+  const ratio = correct / total;
+
+  let title, message, emoji;
+  if (ratio === 1) {
+    title = 'Perfetta!'; emoji = '🎉';
+    message = 'Hai risposto bene a tutte le domande! Sei una vera esperta di geografia.';
+    Audio.win();
+    triggerConfetti();
+  } else if (ratio >= 0.9) {
+    title = 'Bravissima!'; emoji = '🌟';
+    message = 'Quasi perfetto, ottimo lavoro!';
+    Audio.win();
+    triggerConfetti();
+  } else if (ratio >= 0.7) {
+    title = 'Brava!'; emoji = '😊';
+    message = 'Buon risultato, continua così!';
+  } else if (ratio >= 0.5) {
+    title = 'Ci siamo quasi'; emoji = '💪';
+    message = 'Un altro po\' di studio e migliorerai. Riprova!';
+  } else {
+    title = 'Non mollare!'; emoji = '📚';
+    message = 'La geografia è un mondo da scoprire. Riprova quando vuoi.';
+  }
+
+  $('#result-emoji').textContent = emoji;
+  $('#result-title').textContent = title;
+  $('#result-score').textContent = correct + ' / ' + total;
+  $('#result-message').textContent = message;
+
+  // Build map with colored regions
+  const mapWrap = $('#result-map');
+  mapWrap.innerHTML = '';
+  const svg = getMapClone();
+  state.answers.forEach(a => {
+    const regionId = a.question.region.id;
+    const el = svg.querySelector('#r-' + regionId);
+    if (el) el.classList.add(a.correct ? 'r-correct' : 'r-wrong');
+  });
+  mapWrap.appendChild(svg);
+
+  // Show mistakes
+  const mistakes = state.answers.filter(a => !a.correct);
+  const mistakesCard = $('#mistakes-card');
+  if (mistakes.length === 0) {
+    mistakesCard.style.display = 'none';
+  } else {
+    mistakesCard.style.display = 'block';
+    const list = $('#mistakes-list');
+    list.innerHTML = '';
+    mistakes.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'mistake-item';
+      div.innerHTML = `
+        <div class="mistake-q">${escapeHtml(m.question.text)}</div>
+        <div class="mistake-a">
+          La tua risposta: <span class="your">${escapeHtml(m.selected)}</span><br>
+          Risposta giusta: <span class="right">${escapeHtml(m.question.correct)}</span>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // Save score
+  Store.addScore(state.profile, correct, total);
+
+  showScreen('screen-result');
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+// ============ CONFETTI ============
+function triggerConfetti() {
+  const container = $('#confetti');
+  const colors = ['#e8775e', '#3a7d8a', '#f4b860', '#7a8b3f', '#c5d9b8'];
+  const count = 60;
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('span');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+    c.style.animationDelay = Math.random() * 0.5 + 's';
+    c.style.transform = 'rotate(' + Math.floor(Math.random() * 360) + 'deg)';
+    if (Math.random() > 0.5) c.style.borderRadius = '50%';
+    container.appendChild(c);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 4000);
+}
+
+// ============ STATS RENDERING ============
+function renderStats() {
+  const profile = state.profile;
+  const scores = Store.getScores(profile);
+
+  if (scores.length === 0) {
+    $('#stats-row').innerHTML = '<div class="history-list empty">Ancora nessuna partita!<br>Inizia il tuo primo quiz 🎯</div>';
+    $('#history-list').innerHTML = '';
+    return;
+  }
+
+  const total = scores.length;
+  const best = Math.max(...scores.map(s => Math.round(s.score / s.total * 100)));
+  const avg = Math.round(scores.reduce((s, x) => s + x.score / x.total * 100, 0) / scores.length);
+
+  $('#stats-row').innerHTML = `
+    <div class="stat-item"><span class="num">${total}</span><span class="label">Partite</span></div>
+    <div class="stat-item"><span class="num">${best}%</span><span class="label">Migliore</span></div>
+    <div class="stat-item"><span class="num">${avg}%</span><span class="label">Media</span></div>
+  `;
+
+  const recent = scores.slice(0, 6);
+  $('#history-list').innerHTML = recent.map(s => {
+    const d = new Date(s.date);
+    const date = d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+    const time = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    const pct = Math.round(s.score / s.total * 100);
+    let icon = '';
+    if (pct === 100) icon = '🏆';
+    else if (pct >= 80) icon = '🌟';
+    else if (pct >= 60) icon = '👍';
+    return `<div class="row"><span>${icon} ${date} ${time}</span><span>${s.score}/${s.total} (${pct}%)</span></div>`;
+  }).join('');
+}
+
+function renderProfileStats() {
+  ['emma', 'sofia'].forEach(p => {
+    const scores = Store.getScores(p);
+    const sub = $(`[data-stats-line="${p}"]`);
+    if (!sub) return;
+    if (scores.length === 0) {
+      sub.textContent = 'Tocca per giocare';
+    } else {
+      const best = Math.max(...scores.map(s => Math.round(s.score / s.total * 100)));
+      sub.textContent = `${scores.length} partite — migliore ${best}%`;
+    }
+  });
+}
+
+// ============ EVENT WIRING ============
+function selectProfile(name) {
+  state.profile = name;
+  Store.setProfile(name);
+  $('#home-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  // Restore length preference
+  state.questionCount = Store.getLength();
+  $$('.seg-control button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.length, 10) === state.questionCount);
+  });
+  $('#sound-toggle').checked = Store.getSound();
+  renderStats();
+  showScreen('screen-home');
+}
+
+function init() {
+  // Profile buttons
+  $$('.profile-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      Audio.click();
+      selectProfile(b.dataset.profile);
+    });
+  });
+
+  // Change profile
+  $('#btn-change-profile').addEventListener('click', () => {
+    Audio.click();
+    renderProfileStats();
+    showScreen('screen-profile');
+  });
+
+  // Length selector
+  $$('#length-control button').forEach(b => {
+    b.addEventListener('click', () => {
+      Audio.click();
+      const n = parseInt(b.dataset.length, 10);
+      state.questionCount = n;
+      Store.setLength(n);
+      $$('#length-control button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+
+  // Sound toggle
+  $('#sound-toggle').addEventListener('change', e => {
+    Store.setSound(e.target.checked);
+    if (e.target.checked) Audio.click();
+  });
+
+  // Start
+  $('#btn-start').addEventListener('click', () => {
+    Audio.click();
+    startQuiz();
+  });
+
+  // Quit
+  $('#btn-quit').addEventListener('click', () => {
+    if (confirm('Vuoi davvero uscire dal quiz? I progressi di questa partita andranno persi.')) {
+      Audio.click();
+      showScreen('screen-home');
+    }
+  });
+
+  // Retry
+  $('#btn-retry').addEventListener('click', () => {
+    Audio.click();
+    startQuiz();
+  });
+
+  // Home
+  $('#btn-home').addEventListener('click', () => {
+    Audio.click();
+    renderStats();
+    showScreen('screen-home');
+  });
+
+  // Restore profile if present
+  const savedProfile = Store.getProfile();
+  renderProfileStats();
+  if (savedProfile && (savedProfile === 'emma' || savedProfile === 'sofia')) {
+    selectProfile(savedProfile);
+  } else {
+    showScreen('screen-profile');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
