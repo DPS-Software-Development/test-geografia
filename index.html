@@ -11,15 +11,20 @@
   --card: #ffffff;
   --primary: #3a7d8a;
   --primary-dark: #2c5f6b;
-  --coral: #e8775e;
-  --coral-dark: #c95a44;
+  /* WCAG AA: white text needs 4.5:1 — darker coral/correct/wrong for buttons & accents,
+     and lighter "-soft" variants for decorative fills (progress bar, map regions). */
+  --coral: #b04a35;        /* UI: CTA bg, stat numbers, score (white text passes AA) */
+  --coral-dark: #8e3a25;   /* CTA hover */
+  --coral-soft: #e8775e;   /* Decorative: progress fill, confetti */
   --olive: #7a8b3f;
   --sage: #a8c5b0;
   --sand: #efe4cc;
   --text: #2c3e3a;
   --text-soft: #5a6f6b;
-  --correct: #5fa860;
-  --wrong: #d9534f;
+  --correct: #3d7a3e;      /* UI: correct answer button bg, "Esatto!" text */
+  --correct-soft: #5fa860; /* Map fill */
+  --wrong: #a13a37;        /* UI: wrong answer button bg, error text */
+  --wrong-soft: #d9534f;   /* Map fill */
   --map-fill: #d8e3c4;
   --map-stroke: #6a7a4a;
   --map-highlight: #f4b860;
@@ -30,6 +35,21 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+/* Visible focus ring for keyboard users (mouse focus stays clean via :focus-visible) */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.profile-btn:focus-visible,
+.answer-btn:focus-visible,
+.study-cell:focus-visible,
+.btn-icon:focus-visible {
+  outline-offset: 3px;
+}
 
 html, body {
   overflow-x: hidden;
@@ -326,7 +346,8 @@ button {
 
 .seg-control button {
   flex: 1;
-  padding: 10px 0;
+  /* Touch target ≥44px (was 41px) */
+  padding: 14px 0;
   border-radius: 7px;
   font-weight: 700;
   color: var(--text-soft);
@@ -339,7 +360,7 @@ button {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.seg-control-2 button { padding: 12px 0; }
+.seg-control-2 button { padding: 14px 0; }
 
 .hint-small {
   font-size: 0.78rem;
@@ -362,7 +383,15 @@ button {
   height: 28px;
 }
 
-.switch input { display: none; }
+/* Visually hidden but still focusable + announced by screen readers */
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  margin: 0;
+}
 
 .switch .slider {
   position: absolute;
@@ -471,7 +500,7 @@ button {
 
 .progress-fill {
   height: 100%;
-  background: var(--coral);
+  background: var(--coral-soft);
   width: 0%;
   transition: width 0.3s ease;
   border-radius: 4px;
@@ -683,8 +712,9 @@ button {
   color: var(--primary-dark);
   border: none;
   border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 0.85rem;
+  /* Touch target ≥44px height (was 30px) */
+  padding: 12px 16px;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s;
@@ -924,13 +954,13 @@ button {
 }
 
 .italy-map .region.r-correct {
-  fill: var(--correct);
-  stroke: #3d7a3e;
+  fill: var(--correct-soft);
+  stroke: var(--correct);
 }
 
 .italy-map .region.r-wrong {
-  fill: var(--wrong);
-  stroke: #a13a37;
+  fill: var(--wrong-soft);
+  stroke: var(--wrong);
 }
 
 /* ----- RESULT SCREEN ----- */
@@ -1143,18 +1173,18 @@ template { display: none; }
 
     <div class="config-card">
       <div class="label">Numero di domande</div>
-      <div class="seg-control" id="length-control">
-        <button data-length="5">5</button>
-        <button data-length="10" class="active">10</button>
-        <button data-length="15">15</button>
+      <div class="seg-control" id="length-control" role="radiogroup" aria-label="Numero di domande">
+        <button data-length="5" role="radio" aria-checked="false">5</button>
+        <button data-length="10" class="active" role="radio" aria-checked="true">10</button>
+        <button data-length="15" role="radio" aria-checked="false">15</button>
       </div>
     </div>
 
     <div class="config-card">
       <div class="label">Difficoltà</div>
-      <div class="seg-control seg-control-2" id="difficulty-control">
-        <button data-difficulty="easy" class="active">Facile</button>
-        <button data-difficulty="hard">Difficile ✏️</button>
+      <div class="seg-control seg-control-2" id="difficulty-control" role="radiogroup" aria-label="Difficoltà">
+        <button data-difficulty="easy" class="active" role="radio" aria-checked="true">Facile</button>
+        <button data-difficulty="hard" role="radio" aria-checked="false">Difficile ✏️</button>
       </div>
       <div class="hint-small" id="difficulty-hint">Tutto a scelta multipla</div>
     </div>
@@ -1716,9 +1746,11 @@ function genQuestionPosition(region) {
   const others = ['nord-ovest','nord-est','centro','sud','isole'].filter(p => p !== correct);
   const wrong = pickN(others, 3);
   const choices = shuffle([correct, ...wrong]).map(p => POSITION_LABEL[p]);
+  // "Le Marche" is plural in Italian: "si trovano" instead of "si trova"
+  const verb = region.id === 'marche' ? 'si trovano' : 'si trova';
   return {
     type: 'position',
-    text: `In quale parte d'Italia si trova ${prep(region)}${region.name}?`,
+    text: `In quale parte d'Italia ${verb} ${prep(region)}${region.name}?`,
     showMap: true,
     mapHighlight: region.id,
     correct: POSITION_LABEL[correct],
@@ -1780,7 +1812,8 @@ function genQuestionCapital(region) {
   return {
     type: 'capital',
     text: genCapitalText(region),
-    showMap: false,
+    showMap: true,           // anchor the question to the region visually
+    mapHighlight: region.id,
     correct: region.capital,
     choices,
     region: region
@@ -1958,9 +1991,15 @@ function renderQuestion() {
   if (q.showMap) {
     mapWrap.classList.add('active');
     const svg = getMapClone();
+    svg.setAttribute('role', 'img');
     if (q.mapHighlight) {
       const el = svg.querySelector('#r-' + q.mapHighlight);
       if (el) el.classList.add('highlighted');
+      const r = REGION_BY_ID[q.mapHighlight];
+      svg.setAttribute('aria-label',
+        r ? "Mappa d'Italia con la regione " + r.name + " evidenziata" : "Mappa d'Italia");
+    } else {
+      svg.setAttribute('aria-label', "Mappa d'Italia");
     }
     mapWrap.appendChild(svg);
   } else {
@@ -2027,7 +2066,7 @@ function answerSelected(btn, choice) {
   // Update progress fill to include this question
   $('#progress-fill').style.width = ((state.currentIndex + 1) / state.questionCount * 100) + '%';
 
-  // Auto-advance
+  // Auto-advance — wrong answer gets more time so kids can read "the right answer was X"
   setTimeout(() => {
     state.currentIndex++;
     if (state.currentIndex >= state.questions.length) {
@@ -2035,7 +2074,7 @@ function answerSelected(btn, choice) {
     } else {
       renderQuestion();
     }
-  }, isCorrect ? 1100 : 1700);
+  }, isCorrect ? 1100 : 2800);
 }
 
 function answerTyped() {
@@ -2078,7 +2117,7 @@ function answerTyped() {
     } else {
       renderQuestion();
     }
-  }, isCorrect ? 1300 : 2200);
+  }, isCorrect ? 1300 : 3000);
 }
 
 // ============ RESULT ============
@@ -2126,7 +2165,12 @@ function showResult() {
   const mapWrap = $('#result-map');
   mapWrap.innerHTML = '';
   const svg = getMapClone();
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label',
+    "Mappa d'Italia: " + correct + " regioni risposte correttamente, " + (total - correct) + " sbagliate");
   state.answers.forEach(a => {
+    // Some "global" questions (e.g. Monte Bianco, "Quante regioni") have no region: skip on the map.
+    if (!a.question.region) return;
     const regionId = a.question.region.id;
     const el = svg.querySelector('#r-' + regionId);
     if (el) el.classList.add(a.correct ? 'r-correct' : 'r-wrong');
@@ -2192,6 +2236,7 @@ function escapeHtml(str) {
 // ============ CONFETTI ============
 function triggerConfetti() {
   const container = $('#confetti');
+  // Use the lighter "-soft" coral for confetti so they read playful, not muddy
   const colors = ['#e8775e', '#3a7d8a', '#f4b860', '#7a8b3f', '#c5d9b8'];
   const count = 60;
   for (let i = 0; i < count; i++) {
@@ -2312,14 +2357,18 @@ function selectProfile(id) {
     'Pronta per il quiz?',
     'Tutto pronto?'
   );
-  // Restore preferences
+  // Restore preferences (keep aria-checked in sync with the visual .active state)
   state.questionCount = Store.getLength();
   $$('#length-control button').forEach(b => {
-    b.classList.toggle('active', parseInt(b.dataset.length, 10) === state.questionCount);
+    const on = parseInt(b.dataset.length, 10) === state.questionCount;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-checked', on ? 'true' : 'false');
   });
   state.difficulty = Store.getDifficulty();
   $$('#difficulty-control button').forEach(b => {
-    b.classList.toggle('active', b.dataset.difficulty === state.difficulty);
+    const on = b.dataset.difficulty === state.difficulty;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-checked', on ? 'true' : 'false');
   });
   $('#difficulty-hint').textContent = state.difficulty === 'hard'
     ? 'I capoluoghi vanno scritti a mano (accenti e maiuscole non contano).'
@@ -2475,6 +2524,7 @@ function startMiniQuizForRegion(regionId) {
 // ============ FAMILY PROGRESS ============
 function renderFamilyProgress() {
   const host = $('#fp-body');
+  const card = $('#family-progress');
   if (!host) return;
   const dayKey = ts => { const d = new Date(ts); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); };
   const todayKey = dayKey(Date.now());
@@ -2551,9 +2601,14 @@ function renderFamilyProgress() {
     '</div>';
   }).filter(Boolean);
 
-  host.innerHTML = rows.length
-    ? rows.join('')
-    : '<div class="fp-empty">Ancora nessun quiz! Iniziate a giocare per vedere i progressi.</div>';
+  // Hide the whole card on first launch (no quizzes yet) — empty state was disorienting
+  if (!rows.length) {
+    if (card) card.style.display = 'none';
+    host.innerHTML = '';
+    return;
+  }
+  if (card) card.style.display = '';
+  host.innerHTML = rows.join('');
 }
 
 function renderDailyBreakdown(profileId, container) {
@@ -2656,27 +2711,35 @@ function init() {
     trySubmitNewName();
   });
 
-  // Length selector
+  // Length selector (radio-group: keep aria-checked synced)
   $$('#length-control button').forEach(b => {
     b.addEventListener('click', () => {
       Audio.click();
       const n = parseInt(b.dataset.length, 10);
       state.questionCount = n;
       Store.setLength(n);
-      $$('#length-control button').forEach(x => x.classList.remove('active'));
+      $$('#length-control button').forEach(x => {
+        x.classList.remove('active');
+        x.setAttribute('aria-checked', 'false');
+      });
       b.classList.add('active');
+      b.setAttribute('aria-checked', 'true');
     });
   });
 
-  // Difficulty selector
+  // Difficulty selector (radio-group: keep aria-checked synced)
   $$('#difficulty-control button').forEach(b => {
     b.addEventListener('click', () => {
       Audio.click();
       const d = b.dataset.difficulty;
       state.difficulty = d;
       Store.setDifficulty(d);
-      $$('#difficulty-control button').forEach(x => x.classList.remove('active'));
+      $$('#difficulty-control button').forEach(x => {
+        x.classList.remove('active');
+        x.setAttribute('aria-checked', 'false');
+      });
       b.classList.add('active');
+      b.setAttribute('aria-checked', 'true');
       $('#difficulty-hint').textContent = d === 'hard'
         ? 'I capoluoghi vanno scritti a mano (accenti e maiuscole non contano).'
         : 'Tutto a scelta multipla.';
