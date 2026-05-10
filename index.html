@@ -890,7 +890,7 @@ template { display: none; }
       <button class="btn-icon" id="btn-change-profile" aria-label="Cambia profilo">⇄</button>
     </div>
 
-    <h2>Pronta per il quiz?</h2>
+    <h2 id="home-title">Pronta per il quiz?</h2>
 
     <div class="config-card">
       <div class="label">Numero di domande</div>
@@ -1057,6 +1057,7 @@ const REGION_BY_ID = Object.fromEntries(REGIONS.map(r => [r.id, r]));
 // ============ STATE ============
 const state = {
   profile: null,
+  gender: 'n',
   questionCount: 10,
   difficulty: 'easy',
   questions: [],
@@ -1085,17 +1086,22 @@ function checkTypedAnswer(userInput, correctAnswer) {
 }
 
 // ============ RECOMMENDATION (provided by background agent) ============
-function getRecommendation(scores) {
+function getRecommendation(scores, gender) {
   if (!scores || scores.length === 0) return null;
+  const g = gender || 'n';
 
   const last = scores.slice(0, 5); // newest first in our store
   const totalErrors = last.reduce((s, q) => s + (q.errors || []).length, 0);
   const allPerfect = last.every(q => q.score === q.total);
 
   const PERFECT = [
-    { title: 'Sei una campionessa!', body: 'Continua così, stai andando alla grande con la geografia italiana.', emoji: '⭐' },
-    { title: 'Bravissima!', body: 'Gli ultimi quiz sono stati perfetti. Prova ad alzare la difficoltà!', emoji: '🏆' },
-    { title: 'Top!', body: 'Conosci le regioni a memoria. Sfida te stessa con il livello successivo!', emoji: '✨' }
+    { title: gtext(g, 'Sei un campione!', 'Sei una campionessa!', 'Sei un fenomeno!'), body: 'Continua così, stai andando alla grande con la geografia italiana.', emoji: '⭐' },
+    { title: gtext(g, 'Bravissimo!', 'Bravissima!', 'Eccezionale!'), body: 'Gli ultimi quiz sono stati perfetti. Prova ad alzare la difficoltà!', emoji: '🏆' },
+    { title: 'Top!', body: gtext(g,
+        'Conosci le regioni a memoria. Sfida te stesso con il livello successivo!',
+        'Conosci le regioni a memoria. Sfida te stessa con il livello successivo!',
+        'Conosci le regioni a memoria. Prova il livello successivo!'
+      ), emoji: '✨' }
   ];
   if (allPerfect) return PERFECT[Math.floor(Math.random() * PERFECT.length)];
 
@@ -1151,7 +1157,7 @@ function getRecommendation(scores) {
     return pick([
       { title: 'Idea per migliorare', body: `Ti consiglio di ripassare ${t.plain}: vedrai che diventeranno il tuo punto forte!`, emoji: '📖' },
       { title: 'Prossimo obiettivo', body: `Dedica un po' di tempo ${t.to} e farai un salto in avanti!`, emoji: '🎯' },
-      { title: 'Piccolo consiglio', body: `Concentrati ${t.on} nel prossimo quiz, sei vicinissima!`, emoji: '✏️' }
+      { title: 'Piccolo consiglio', body: `Concentrati ${t.on} nel prossimo quiz, ${gtext(g, 'ci sei vicinissimo', 'sei vicinissima', 'ci sei quasi')}!`, emoji: '✏️' }
     ]);
   }
 
@@ -1160,7 +1166,7 @@ function getRecommendation(scores) {
     return pick([
       { title: 'Esploriamo insieme', body: `Concentrati sulle regioni ${a.of}: dai un'occhiata alla mappa e saranno tue!`, emoji: '🧭' },
       { title: 'Mini-missione', body: `Le regioni ${a.of} aspettano solo te. Un ripasso e vedrai che differenza!`, emoji: '🌍' },
-      { title: 'Hai quasi fatto', body: `Ti consiglio di rivedere ${a.plain}. Sei più brava di quanto pensi!`, emoji: '🔍' }
+      { title: 'Hai quasi fatto', body: `Ti consiglio di rivedere ${a.plain}. ${gtext(g, 'Sei più bravo', 'Sei più brava', 'Sei più in gamba')} di quanto pensi!`, emoji: '🔍' }
     ]);
   }
 
@@ -1199,6 +1205,41 @@ function profileColor(id) {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
   return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+
+// Gender heuristic for Italian first names. Returns 'm' | 'f' | 'n' (unknown/neutral).
+// Designed to NEVER misgender Emma/Sofia (clearly -a feminine) and to handle the common
+// masculine -a names (Luca, Andrea, Mattia, etc.) via an override set.
+const MASCULINE_NAMES_IN_A = new Set([
+  'luca','andrea','mattia','nicola','elia','tobia','jeremia','gioia','barnaba','isaia',
+  'attila','enea','noah','jonatha','jeremia','simba'
+]);
+const FEMININE_NAMES_NOT_A = new Set([
+  'beatrice','alice','agnese','irene','adelaide','eloise','clemence','eve','rachel'
+]);
+
+function detectGender(displayName) {
+  if (!displayName) return 'n';
+  // First token only ("Maria José" → "maria")
+  const first = String(displayName).trim().split(/\s+/)[0] || '';
+  // Strip accents and non-letters
+  const norm = first.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z]/g, '');
+  if (!norm) return 'n';
+  if (MASCULINE_NAMES_IN_A.has(norm)) return 'm';
+  if (FEMININE_NAMES_NOT_A.has(norm)) return 'f';
+  const last = norm[norm.length - 1];
+  if (last === 'a') return 'f';
+  if (last === 'o') return 'm';
+  return 'n';
+}
+
+// Pick the right form: gender 'm' | 'f' | 'n'; n is the neutral fallback.
+function gtext(g, mascForm, femForm, neutralForm) {
+  if (g === 'm') return mascForm;
+  if (g === 'f') return femForm;
+  return neutralForm;
 }
 
 // ============ STORAGE ============
@@ -1628,18 +1669,26 @@ function showResult() {
   const ratio = correct / total;
 
   let title, message, emoji;
+  const g = state.gender || 'n';
   if (ratio === 1) {
-    title = 'Perfetta!'; emoji = '🎉';
-    message = 'Hai risposto bene a tutte le domande! Sei una vera esperta di geografia.';
+    title = gtext(g, 'Perfetto!', 'Perfetta!', 'Tutto giusto!');
+    emoji = '🎉';
+    message = gtext(g,
+      'Hai risposto bene a tutte le domande! Sei un vero esperto di geografia.',
+      'Hai risposto bene a tutte le domande! Sei una vera esperta di geografia.',
+      'Hai risposto bene a tutte le domande! Conosci la geografia italiana a memoria.'
+    );
     Audio.win();
     triggerConfetti();
   } else if (ratio >= 0.9) {
-    title = 'Bravissima!'; emoji = '🌟';
+    title = gtext(g, 'Bravissimo!', 'Bravissima!', 'Eccezionale!');
+    emoji = '🌟';
     message = 'Quasi perfetto, ottimo lavoro!';
     Audio.win();
     triggerConfetti();
   } else if (ratio >= 0.7) {
-    title = 'Brava!'; emoji = '😊';
+    title = gtext(g, 'Bravo!', 'Brava!', 'Bel risultato!');
+    emoji = '😊';
     message = 'Buon risultato, continua così!';
   } else if (ratio >= 0.5) {
     title = 'Ci siamo quasi'; emoji = '💪';
@@ -1701,7 +1750,7 @@ function showResult() {
   Store.addScore(state.profile, correct, total, errorsForStore, state.difficulty || 'easy');
 
   // Recommendation card based on history
-  const rec = getRecommendation(Store.getScores(state.profile));
+  const rec = getRecommendation(Store.getScores(state.profile), state.gender);
   const recCard = $('#recommendation-card');
   if (rec) {
     $('#rec-emoji').textContent = rec.emoji || '💡';
@@ -1837,7 +1886,13 @@ function selectProfile(id) {
   state.profile = id;
   Store.setProfile(id);
   const displayName = Store.getProfileName(id);
+  state.gender = detectGender(displayName);
   $('#home-name').textContent = displayName;
+  $('#home-title').textContent = gtext(state.gender,
+    'Pronto per il quiz?',
+    'Pronta per il quiz?',
+    'Tutto pronto?'
+  );
   // Restore preferences
   state.questionCount = Store.getLength();
   $$('#length-control button').forEach(b => {
