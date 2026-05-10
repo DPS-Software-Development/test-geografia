@@ -1,19 +1,19 @@
 # Test di Geografia — Regioni d'Italia
 
-Web app responsive per studiare le **regioni italiane** (capoluoghi, confini, posizione geografica), pensata per cellulari e bambini di scuola elementare/media.
+Web app responsive per studiare le **regioni italiane** (capoluoghi, confini, posizione geografica, fiumi, monti, laghi), pensata per cellulari e bambini di scuola elementare/media.
 
 ## Caratteristiche
 
 - 📱 **Mobile-first**, funziona perfettamente su telefono
-- 👥 **Due profili** con storico punteggi separato
+- 👥 **Profili multipli** con storico punteggi separato (Emma, Sofia + custom)
 - 🗺️ **Mappa SVG interattiva** con regioni evidenziate
-- ✅ **5 tipi di domanda** (capoluogo, "confina con", "non confina con", posizione, identifica regione)
-- 🎯 **Feedback immediato** verde/rosso + riepilogo finale con mappa colorata
-- 🎉 **Confetti** per i punteggi alti
-- 🔊 Suoni opzionali (Web Audio API, niente file esterni)
+- ✅ **9 tipi di domanda** (capoluogo, confina/non confina, posizione, identifica regione, fiume, monte, lago, Italia generale)
+- 📖 **Modalità Studio** — scheda per regione + mini-quiz dedicato
+- 👨‍👩‍👧 **Card "Progressi famiglia"** — overview di tutti i profili
+- 🎯 **Feedback adattivo** — raccomandazioni basate sugli errori recenti
+- 🎉 Confetti per i punteggi alti, suoni opzionali (Web Audio API)
 - 💾 **Punteggi salvati localmente** (localStorage), niente cloud, niente account
-- 📦 **Singolo file HTML** auto-sufficiente (~110KB)
-- 🚫 **Niente dipendenze runtime**, niente build step per usarlo
+- 📦 **Singolo file HTML** auto-sufficiente (~160 KB)
 
 ## Come usare in locale
 
@@ -24,20 +24,12 @@ python -m http.server 8000
 # poi vai su http://localhost:8000
 ```
 
-## Deploy
+## Deploy (Railway)
 
-### GitHub Pages (automatico)
-
-Già abilitato sul repo: `https://<owner>.github.io/<repo>/`.
-Ogni push su `main` ridistribuisce.
-
-### Railway
-
-Il repo contiene `Dockerfile` + `railway.json` per deploy nginx-based.
+Il repo contiene `Dockerfile` + `railway.json` per il deploy nginx-based.
 
 ```powershell
 railway login
-railway init
 railway up --detach
 railway domain   # genera l'URL pubblico *.up.railway.app
 ```
@@ -46,15 +38,17 @@ railway domain   # genera l'URL pubblico *.up.railway.app
 
 ```
 index.html              # L'app completa (SVG + CSS + JS inline)
-Dockerfile              # Per Railway (nginx alpine, 3 righe)
+app_template.html       # Template sorgente
+italy_clean.svg         # SVG delle 20 regioni (id="r-<regione>")
+geo-data.json           # Dataset fatti geografici (pubblico)
+build_svg.py            # GeoJSON regioni → italy_clean.svg
+build_app.py            # app_template.html + italy_clean.svg → index.html
+Dockerfile              # nginx alpine con $PORT envsubst
+nginx.conf.template     # Config nginx
 railway.json            # Config Railway
-app_template.html       # Template usato dalla build pipeline
-italy_clean.svg         # SVG delle 20 regioni con id="r-<regione>"
-build_svg.py            # Script: GeoJSON regioni → italy_clean.svg
-build_app.py            # Script: app_template.html + italy_clean.svg → index.html
 ```
 
-## Rigenerare la mappa o il file index.html
+## Rigenerare la mappa o l'app
 
 ```powershell
 # 1. Scarica il GeoJSON sorgente (escluso dal repo per dimensione)
