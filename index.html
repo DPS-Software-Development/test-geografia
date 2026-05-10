@@ -570,6 +570,250 @@ button {
   40%, 80% { transform: translateX(6px); }
 }
 
+/* ----- STUDY MODE ----- */
+.study-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.study-title {
+  margin: 0;
+  flex: 1;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}
+.study-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.study-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  padding: 12px 12px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+.study-cell:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+.study-cell:active { transform: scale(0.97); }
+.study-cell .study-init {
+  width: 36px; height: 36px; flex: 0 0 36px;
+  display: grid; place-items: center;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.study-cell .study-meta { display: flex; flex-direction: column; min-width: 0; }
+.study-cell .study-name {
+  font-weight: 600;
+  color: var(--primary-dark);
+  font-size: 0.92rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.study-cell .study-pos {
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+.study-map {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 10px;
+  margin-bottom: 14px;
+  display: grid;
+  place-items: center;
+}
+.study-map svg { width: 100%; max-width: 260px; height: auto; }
+.study-map .region { fill: var(--map-fill); stroke: var(--map-stroke); stroke-width: 0.8; }
+.study-map .region.highlighted { fill: var(--map-highlight); stroke-width: 1.3; }
+.study-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.study-section {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+}
+.study-section h3 {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.study-section .content {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.4;
+  font-weight: 600;
+}
+.study-section .content.empty {
+  color: var(--text-soft);
+  font-style: italic;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.study-section ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.95rem;
+}
+.study-section li { margin: 2px 0; color: var(--text); }
+.border-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.border-chip {
+  background: var(--sand);
+  color: var(--primary-dark);
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+.border-chip:hover { background: var(--sage); }
+.border-chip:active { background: var(--olive); color: #fff; }
+
+/* ----- FAMILY PROGRESS CARD ----- */
+.family-progress {
+  background: var(--card);
+  padding: 18px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-top: 16px;
+}
+.fp-title {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fp-body { display: flex; flex-direction: column; gap: 10px; }
+.fp-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(58,125,138,0.1);
+}
+.fp-row:first-child { border-top: 0; padding-top: 2px; }
+.fp-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.fp-name { font-weight: 700; font-size: 0.98rem; color: var(--primary-dark); }
+.fp-stats {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  text-align: right;
+}
+.fp-stats b { color: var(--text); font-weight: 700; }
+.fp-trend { margin-left: 4px; font-size: 0.95rem; }
+.fp-meta {
+  grid-column: 1 / -1;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  padding-left: 42px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+}
+.fp-streak { color: var(--coral); font-weight: 600; }
+.fp-weak { color: var(--olive); }
+.fp-weak.fp-clean { color: var(--correct); font-weight: 600; }
+.fp-empty {
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  padding: 8px 4px;
+}
+.fp-toggle {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 2px 6px;
+  font-weight: 600;
+  font-family: inherit;
+}
+.fp-toggle[aria-expanded="true"] .fp-toggle-icon { transform: rotate(180deg); }
+.fp-toggle-icon { display: inline-block; transition: transform 0.2s; }
+
+/* Daily breakdown */
+.fp-daily-wrap[hidden] { display: none; }
+.fp-daily {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  grid-column: 1 / -1;
+}
+.fp-daily-row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 6px 10px;
+  align-items: center;
+  padding: 4px 0;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+.fp-daily-row:first-child { border-top: none; }
+.fp-day-label { color: var(--text-soft); font-weight: 600; font-size: 0.78rem; }
+.fp-day-bars { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; }
+.fp-day-bar {
+  display: inline-block;
+  width: 6px; height: 14px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+.fp-day-count { color: var(--text-soft); font-size: 0.75rem; margin-left: 6px; }
+.fp-day-scores { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.fp-day-score {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+.fp-day-score.good { background: var(--correct); }
+.fp-day-score.mid  { background: var(--coral); }
+.fp-day-score.bad  { background: var(--wrong); }
+@media (max-width: 480px) {
+  .fp-daily-row { grid-template-columns: 48px 1fr; gap: 4px; }
+  .fp-day-scores { grid-column: 1 / -1; justify-content: flex-start; padding-left: 48px; }
+}
+
 /* ----- TYPED ANSWER (HARD MODE) ----- */
 .typed-area {
   display: none;
@@ -855,6 +1099,11 @@ template { display: none; }
     <div class="profile-buttons" id="profile-buttons">
       <!-- Rendered dynamically by renderProfileButtons() -->
     </div>
+
+    <section class="family-progress" id="family-progress" aria-labelledby="fp-title">
+      <h2 class="fp-title" id="fp-title"><span aria-hidden="true">📊</span> Progressi famiglia</h2>
+      <div class="fp-body" id="fp-body"></div>
+    </section>
   </section>
 
   <!-- ============ NEW NAME SCREEN ============ -->
@@ -921,12 +1170,33 @@ template { display: none; }
     </div>
 
     <button class="btn-primary" id="btn-start">▶  Inizia il quiz</button>
+    <button class="btn-secondary" id="btn-study" style="margin-top:10px;">📖  Studia le regioni</button>
 
     <div class="stats-card">
       <h3>I tuoi progressi</h3>
       <div class="stats-row" id="stats-row"></div>
       <div class="history-list" id="history-list"></div>
     </div>
+  </section>
+
+  <!-- ============ STUDY LIST ============ -->
+  <section id="screen-study-list" class="screen">
+    <div class="study-header">
+      <button class="btn-icon" id="btn-back-studylist" aria-label="Indietro">←</button>
+      <h2 class="study-title">Studia le regioni</h2>
+    </div>
+    <div id="study-grid" class="study-grid" role="list"></div>
+  </section>
+
+  <!-- ============ STUDY CARD (single region) ============ -->
+  <section id="screen-study-card" class="screen">
+    <div class="study-header">
+      <button class="btn-icon" id="btn-back-studycard" aria-label="Indietro">←</button>
+      <h2 class="study-title" id="study-card-title">REGIONE</h2>
+    </div>
+    <div id="study-card-map" class="study-map"></div>
+    <div id="study-card-body" class="study-card-body"></div>
+    <button class="btn-primary" id="btn-mini-quiz" style="margin-top:8px;">🎯  Mettiti alla prova</button>
   </section>
 
   <!-- ============ QUIZ ============ -->
@@ -1669,6 +1939,11 @@ function startQuiz() {
 }
 
 function renderQuestion() {
+  // Clear any lingering focus from the previously-clicked answer button
+  // (fix bug: il pulsante della domanda precedente restava visibilmente selezionato)
+  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
   const q = state.questions[state.currentIndex];
   state.locked = false;
 
@@ -2074,15 +2349,285 @@ function trySubmitNewName() {
   selectProfile(id);
 }
 
+// ============ STUDY MODE ============
+const STUDY_ICONS = { capital:'🏛', position:'🧭', borders:'🗺', rivers:'💧', mountains:'⛰', lakes:'🌊' };
+let studyState = { fromMiniQuiz: null };
+
+function openStudyList() {
+  Audio.click();
+  renderStudyList();
+  showScreen('screen-study-list');
+}
+
+function renderStudyList() {
+  const grid = $('#study-grid');
+  grid.innerHTML = '';
+  REGIONS.forEach(r => {
+    const cell = document.createElement('button');
+    cell.className = 'study-cell';
+    cell.innerHTML =
+      '<span class="study-init" style="background:' + profileColor(r.id) + '">' + escapeHtml(r.name[0]) + '</span>' +
+      '<span class="study-meta">' +
+        '<span class="study-name">' + escapeHtml(r.name) + '</span>' +
+        '<span class="study-pos">' + escapeHtml(POSITION_LABEL[r.position]) + '</span>' +
+      '</span>';
+    cell.addEventListener('click', () => openStudyCard(r.id));
+    grid.appendChild(cell);
+  });
+}
+
+function openStudyCard(regionId) {
+  Audio.click();
+  const r = REGION_BY_ID[regionId];
+  if (!r) return;
+  $('#study-card-title').textContent = r.name.toUpperCase();
+  const mapBox = $('#study-card-map');
+  mapBox.innerHTML = '';
+  const svg = getMapClone();
+  const target = svg.querySelector('#r-' + r.id);
+  if (target) target.classList.add('highlighted');
+  mapBox.appendChild(svg);
+
+  const body = $('#study-card-body');
+  body.innerHTML = '';
+  body.appendChild(buildStudySection('capital', 'Capoluogo', escapeHtml(r.capital)));
+  body.appendChild(buildStudySection('position', 'Posizione', escapeHtml(POSITION_LABEL[r.position])));
+  body.appendChild(buildStudyBordersSection(r.borders));
+  body.appendChild(buildStudyListSection('rivers', 'Fiumi', r.rivers, 'Nessun fiume rilevante'));
+  body.appendChild(buildStudyListSection('mountains', 'Monti / catene', r.mountains, 'Nessun monte rilevante'));
+  body.appendChild(buildStudyListSection('lakes', 'Laghi', r.lakes, 'Nessun lago rilevante'));
+
+  $('#btn-mini-quiz').onclick = () => startMiniQuizForRegion(r.id);
+  showScreen('screen-study-card');
+}
+
+function buildStudySection(key, label, value) {
+  const s = document.createElement('div');
+  s.className = 'study-section';
+  s.innerHTML = '<h3>' + STUDY_ICONS[key] + ' ' + label + '</h3><div class="content">' + value + '</div>';
+  return s;
+}
+
+function buildStudyListSection(key, label, items, emptyMsg) {
+  const s = document.createElement('div');
+  s.className = 'study-section';
+  const has = items && items.length;
+  const content = has
+    ? '<ul>' + items.map(i => '<li>' + escapeHtml(i) + '</li>').join('') + '</ul>'
+    : '<div class="content empty">' + emptyMsg + '</div>';
+  s.innerHTML = '<h3>' + STUDY_ICONS[key] + ' ' + label + '</h3>' + content;
+  return s;
+}
+
+function buildStudyBordersSection(borders) {
+  const s = document.createElement('div');
+  s.className = 'study-section';
+  if (!borders || !borders.length) {
+    s.innerHTML = '<h3>' + STUDY_ICONS.borders + ' Confini</h3><div class="content empty">Nessun confine terrestre</div>';
+    return s;
+  }
+  const chips = borders.map(id => {
+    const reg = REGION_BY_ID[id];
+    return reg ? '<button class="border-chip" data-region="' + id + '">' + escapeHtml(reg.name) + '</button>' : '';
+  }).join('');
+  s.innerHTML = '<h3>' + STUDY_ICONS.borders + ' Confini</h3><div class="border-chips">' + chips + '</div>';
+  s.querySelectorAll('.border-chip').forEach(c => {
+    c.addEventListener('click', () => openStudyCard(c.dataset.region));
+  });
+  return s;
+}
+
+function startMiniQuizForRegion(regionId) {
+  Audio.click();
+  const region = REGION_BY_ID[regionId];
+  if (!region) return;
+  const types = ['capital', 'border-is', 'border-not', 'position', 'river', 'mountain', 'lake'];
+  const candidates = [];
+  for (const type of types) {
+    for (let i = 0; i < 4; i++) {
+      const q = QUESTION_GENERATORS[type] && QUESTION_GENERATORS[type](region);
+      if (q) candidates.push(q);
+    }
+  }
+  const seen = new Set();
+  const unique = candidates.filter(q => {
+    const k = q.type + ':' + q.correct;
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+  const questions = shuffle(unique).slice(0, 5);
+  if (questions.length === 0) return;
+
+  state.questions = questions;
+  state.questionCount = questions.length;
+  state.currentIndex = 0;
+  state.answers = [];
+  state.locked = false;
+  state.difficulty = state.difficulty || 'easy';
+  studyState.fromMiniQuiz = regionId;
+  $('#q-total').textContent = questions.length;
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+// ============ FAMILY PROGRESS ============
+function renderFamilyProgress() {
+  const host = $('#fp-body');
+  if (!host) return;
+  const dayKey = ts => { const d = new Date(ts); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); };
+  const todayKey = dayKey(Date.now());
+  const yesterdayKey = dayKey(Date.now() - 86400000);
+
+  const rows = Store.getAllProfiles().map(p => {
+    const scores = Store.getScores(p.id);
+    if (!scores || !scores.length) return null;
+
+    const days = [...new Set(scores.map(s => dayKey(s.date)))];
+    let streak = 0;
+    if (days[0] === todayKey || days[0] === yesterdayKey) {
+      let cursor = new Date(); cursor.setHours(0,0,0,0);
+      if (days[0] === yesterdayKey) cursor.setDate(cursor.getDate()-1);
+      for (const d of days) {
+        if (d === dayKey(cursor.getTime())) { streak++; cursor.setDate(cursor.getDate()-1); }
+        else break;
+      }
+    }
+
+    const last5 = scores.slice(0,5);
+    const pct = s => s.total ? (s.score/s.total)*100 : 0;
+    const avg = arr => arr.reduce((a,s)=>a+pct(s),0) / arr.length;
+    const mean5 = Math.round(avg(last5));
+    let trend = '➡️', trendLabel = 'stabile';
+    if (last5.length >= 4) {
+      const oldTwo = avg(last5.slice(-2));
+      const newTwo = avg(last5.slice(0,2));
+      const delta = newTwo - oldTwo;
+      if (delta > 5) { trend='⬆️'; trendLabel='in salita'; }
+      else if (delta < -5) { trend='⬇️'; trendLabel='in calo'; }
+    }
+
+    const last10 = scores.slice(0,10);
+    const byType = {};
+    for (const s of last10) {
+      for (const e of (s.errors||[])) {
+        if (!e.type) continue;
+        byType[e.type] = (byType[e.type] || 0) + 1;
+      }
+    }
+    let weakHtml;
+    const entries = Object.entries(byType);
+    if (!entries.length) {
+      weakHtml = '<span class="fp-weak fp-clean">Nessun errore recente!</span>';
+    } else {
+      entries.sort((a,b) => b[1]-a[1]);
+      const TYPE_SHORT = {
+        'capital':'capoluoghi','border-is':'confini','border-not':'confini',
+        'position':'posizione','identify':'riconoscimento','river':'fiumi',
+        'mountain':'monti','lake':'laghi','global':"Italia generale"
+      };
+      const label = TYPE_SHORT[entries[0][0]] || entries[0][0];
+      weakHtml = '<span class="fp-weak">da rivedere: ' + label + '</span>';
+    }
+
+    const initial = (p.name[0] || '?').toUpperCase();
+    const streakHtml = streak > 0
+      ? '<span class="fp-streak" title="giorni consecutivi">🔥 ' + streak + ' ' + (streak===1?'giorno':'giorni') + '</span>'
+      : '';
+
+    return '<div class="fp-row" data-fp-profile="' + p.id + '">' +
+      '<div class="fp-avatar" style="background:' + profileColor(p.id) + '">' + escapeHtml(initial) + '</div>' +
+      '<div class="fp-name">' + escapeHtml(p.name) + '</div>' +
+      '<div class="fp-stats">' +
+        '<b>' + scores.length + '</b> ' + (scores.length===1?'partita':'partite') + ' · media <b>' + mean5 + '%</b>' +
+        '<span class="fp-trend" title="trend ' + trendLabel + '">' + trend + '</span>' +
+      '</div>' +
+      '<div class="fp-meta">' +
+        streakHtml + (streakHtml && weakHtml ? '<span aria-hidden="true">·</span>' : '') + weakHtml +
+        ' <button class="fp-toggle" aria-expanded="false" aria-label="Mostra storico giornaliero"><span class="fp-toggle-icon">▾</span> <span class="fp-toggle-label">vedi giorni</span></button>' +
+        '<div class="fp-daily-wrap" hidden></div>' +
+      '</div>' +
+    '</div>';
+  }).filter(Boolean);
+
+  host.innerHTML = rows.length
+    ? rows.join('')
+    : '<div class="fp-empty">Ancora nessun quiz! Iniziate a giocare per vedere i progressi.</div>';
+}
+
+function renderDailyBreakdown(profileId, container) {
+  const scores = Store.getScores(profileId) || [];
+  const dayKey = ts => { const d = new Date(ts); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); };
+  const groups = new Map();
+  scores.forEach(s => {
+    const k = dayKey(s.date);
+    if (!groups.has(k)) groups.set(k, { date: s.date, scores: [] });
+    groups.get(k).scores.push(s);
+  });
+  const days = [...groups.values()].sort((a,b) => b.date - a.date).slice(0, 10);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const yest = new Date(today); yest.setDate(yest.getDate()-1);
+  const months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  const label = ts => {
+    const d = new Date(ts); d.setHours(0,0,0,0);
+    if (d.getTime() === today.getTime()) return 'oggi';
+    if (d.getTime() === yest.getTime()) return 'ieri';
+    return d.getDate() + ' ' + months[d.getMonth()];
+  };
+  const cls = s => { const p = s.score/s.total*100; return p>=80?'good':p>=60?'mid':'bad'; };
+  if (!days.length) {
+    container.innerHTML = '<div class="fp-daily"><div class="fp-daily-row"><span class="fp-day-label">nessuna partita ancora</span></div></div>';
+    return;
+  }
+  container.innerHTML = '<div class="fp-daily">' + days.map(g =>
+    '<div class="fp-daily-row">' +
+      '<span class="fp-day-label">' + label(g.date) + '</span>' +
+      '<span class="fp-day-bars">' +
+        g.scores.map(() => '<span class="fp-day-bar"></span>').join('') +
+        '<span class="fp-day-count">' + g.scores.length + '</span>' +
+      '</span>' +
+      '<span class="fp-day-scores">' +
+        g.scores.map(s => '<span class="fp-day-score ' + cls(s) + '">' + s.score + '/' + s.total + '</span>').join('') +
+      '</span>' +
+    '</div>'
+  ).join('') + '</div>';
+}
+
 function init() {
   // Render profile buttons dynamically (Emma, Sofia, custom profiles, + add)
   renderProfileButtons();
+  renderFamilyProgress();
 
   // Change profile
   $('#btn-change-profile').addEventListener('click', () => {
     Audio.click();
     renderProfileButtons();
+    renderFamilyProgress();
     showScreen('screen-profile');
+  });
+
+  // Study mode
+  $('#btn-study').addEventListener('click', openStudyList);
+  $('#btn-back-studylist').addEventListener('click', () => {
+    Audio.click();
+    showScreen('screen-home');
+  });
+  $('#btn-back-studycard').addEventListener('click', () => {
+    Audio.click();
+    showScreen('screen-study-list');
+  });
+
+  // Family progress: delegate daily-breakdown toggle
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.fp-toggle');
+    if (!btn) return;
+    const row = btn.closest('[data-fp-profile]');
+    if (!row) return;
+    const wrap = row.querySelector('.fp-daily-wrap');
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', !open);
+    btn.querySelector('.fp-toggle-label').textContent = open ? 'vedi giorni' : 'nascondi';
+    if (open) { wrap.innerHTML = ''; wrap.hidden = true; }
+    else { wrap.hidden = false; renderDailyBreakdown(row.dataset.fpProfile, wrap); }
   });
 
   // New name screen
@@ -2176,14 +2721,26 @@ function init() {
   // Retry
   $('#btn-retry').addEventListener('click', () => {
     Audio.click();
-    startQuiz();
+    if (studyState.fromMiniQuiz) {
+      const rid = studyState.fromMiniQuiz;
+      studyState.fromMiniQuiz = null;
+      startMiniQuizForRegion(rid);
+    } else {
+      startQuiz();
+    }
   });
 
   // Home
   $('#btn-home').addEventListener('click', () => {
     Audio.click();
-    renderStats();
-    showScreen('screen-home');
+    if (studyState.fromMiniQuiz) {
+      const rid = studyState.fromMiniQuiz;
+      studyState.fromMiniQuiz = null;
+      openStudyCard(rid);
+    } else {
+      renderStats();
+      showScreen('screen-home');
+    }
   });
 
   // Restore profile if present and still valid
