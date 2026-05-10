@@ -3291,8 +3291,20 @@ function init() {
   //    profile sees updated stats from other devices.
   // ?import in the URL forces a re-import even if the flag is set — used to
   // recover when the very first run was interrupted before the PUT finished.
-  const forceImport = new URLSearchParams(location.search).has('import');
+  const params = new URLSearchParams(location.search);
+  const forceImport = params.has('import');
   if (forceImport) localStorage.removeItem('geo_synced_v1');
+  // ?cleanup=<profileId> wipes the local scores for a specific profile —
+  // used after moving scores between profiles on the server.
+  const cleanupProfile = params.get('cleanup');
+  if (cleanupProfile) {
+    localStorage.removeItem('geo_scores_' + cleanupProfile);
+    history.replaceState(null, '', location.pathname);
+    // Re-render so the card updates immediately and show a confirmation.
+    renderProfileButtons();
+    renderFamilyProgress();
+    setTimeout(() => showToast('🧹 Pulito storico locale di "' + cleanupProfile + '"'), 100);
+  }
   (async () => {
     try {
       const importedCount = await Sync.importBaselineIfNeeded(forceImport);
