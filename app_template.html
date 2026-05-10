@@ -999,27 +999,57 @@ template { display: none; }
 
 // ============ DATA ============
 const REGIONS = [
-  { id:'piemonte', name:'Piemonte', capital:'Torino', position:'nord-ovest', borders:['valle-d-aosta','lombardia','liguria','emilia-romagna'] },
-  { id:'valle-d-aosta', name:"Valle d'Aosta", capital:'Aosta', position:'nord-ovest', borders:['piemonte'] },
-  { id:'lombardia', name:'Lombardia', capital:'Milano', position:'nord-ovest', borders:['piemonte','trentino-alto-adige','veneto','emilia-romagna'] },
-  { id:'liguria', name:'Liguria', capital:'Genova', position:'nord-ovest', borders:['piemonte','emilia-romagna','toscana'] },
-  { id:'trentino-alto-adige', name:'Trentino-Alto Adige', capital:'Trento', position:'nord-est', borders:['lombardia','veneto'] },
-  { id:'veneto', name:'Veneto', capital:'Venezia', position:'nord-est', borders:['lombardia','trentino-alto-adige','friuli-venezia-giulia','emilia-romagna'] },
-  { id:'friuli-venezia-giulia', name:'Friuli-Venezia Giulia', capital:'Trieste', position:'nord-est', borders:['veneto'] },
-  { id:'emilia-romagna', name:'Emilia-Romagna', capital:'Bologna', position:'nord-est', borders:['lombardia','veneto','marche','toscana','liguria'] },
-  { id:'toscana', name:'Toscana', capital:'Firenze', position:'centro', borders:['liguria','emilia-romagna','marche','umbria','lazio'] },
-  { id:'umbria', name:'Umbria', capital:'Perugia', position:'centro', borders:['toscana','marche','lazio'] },
-  { id:'marche', name:'Marche', capital:'Ancona', position:'centro', borders:['emilia-romagna','toscana','umbria','lazio','abruzzo'] },
-  { id:'lazio', name:'Lazio', capital:'Roma', position:'centro', borders:['toscana','umbria','marche','abruzzo','molise','campania'] },
-  { id:'abruzzo', name:'Abruzzo', capital:"L'Aquila", position:'sud', borders:['marche','lazio','molise'] },
-  { id:'molise', name:'Molise', capital:'Campobasso', position:'sud', borders:['abruzzo','lazio','campania','puglia'] },
-  { id:'campania', name:'Campania', capital:'Napoli', position:'sud', borders:['lazio','molise','puglia','basilicata'] },
-  { id:'puglia', name:'Puglia', capital:'Bari', position:'sud', borders:['molise','campania','basilicata'] },
-  { id:'basilicata', name:'Basilicata', capital:'Potenza', position:'sud', borders:['campania','puglia','calabria'] },
-  { id:'calabria', name:'Calabria', capital:'Catanzaro', position:'sud', borders:['basilicata'] },
-  { id:'sicilia', name:'Sicilia', capital:'Palermo', position:'isole', borders:[] },
-  { id:'sardegna', name:'Sardegna', capital:'Cagliari', position:'isole', borders:[] }
+  { id:'valle-d-aosta', name:"Valle d'Aosta", capital:'Aosta', position:'nord-ovest', borders:['piemonte'],
+    rivers:['Dora Baltea'], mountains:['Alpi','Monte Bianco','Cervino','Monte Rosa'], lakes:[] },
+  { id:'piemonte', name:'Piemonte', capital:'Torino', position:'nord-ovest', borders:['valle-d-aosta','lombardia','liguria','emilia-romagna'],
+    rivers:['Po','Dora Baltea','Tanaro','Ticino'], mountains:['Alpi','Monviso','Gran Paradiso','Appennino Ligure'], lakes:['Maggiore','Orta'] },
+  { id:'lombardia', name:'Lombardia', capital:'Milano', position:'nord-ovest', borders:['piemonte','trentino-alto-adige','veneto','emilia-romagna'],
+    rivers:['Po','Ticino','Adda','Oglio'], mountains:['Alpi','Prealpi','Ortles'], lakes:['Garda','Como','Maggiore','Iseo'] },
+  { id:'liguria', name:'Liguria', capital:'Genova', position:'nord-ovest', borders:['piemonte','emilia-romagna','toscana'],
+    rivers:['Magra','Roia'], mountains:['Alpi Marittime','Appennino Ligure'], lakes:[] },
+  { id:'trentino-alto-adige', name:'Trentino-Alto Adige', capital:'Trento', position:'nord-est', borders:['lombardia','veneto'],
+    rivers:['Adige','Isarco'], mountains:['Dolomiti','Marmolada','Ortles'], lakes:['Garda'] },
+  { id:'veneto', name:'Veneto', capital:'Venezia', position:'nord-est', borders:['lombardia','trentino-alto-adige','friuli-venezia-giulia','emilia-romagna'],
+    rivers:['Po','Adige','Piave','Brenta'], mountains:['Dolomiti','Marmolada','Prealpi Venete'], lakes:['Garda'] },
+  { id:'friuli-venezia-giulia', name:'Friuli-Venezia Giulia', capital:'Trieste', position:'nord-est', borders:['veneto'],
+    rivers:['Tagliamento','Isonzo'], mountains:['Alpi Carniche','Alpi Giulie'], lakes:[] },
+  { id:'emilia-romagna', name:'Emilia-Romagna', capital:'Bologna', position:'nord-est', borders:['lombardia','veneto','marche','toscana','liguria'],
+    rivers:['Po','Reno','Trebbia'], mountains:['Appennino Tosco-Emiliano','Monte Cimone'], lakes:[] },
+  { id:'toscana', name:'Toscana', capital:'Firenze', position:'centro', borders:['liguria','emilia-romagna','marche','umbria','lazio'],
+    rivers:['Arno','Serchio','Ombrone'], mountains:['Apuane','Appennino Tosco-Emiliano','Monte Amiata'], lakes:['Massaciuccoli'] },
+  { id:'umbria', name:'Umbria', capital:'Perugia', position:'centro', borders:['toscana','marche','lazio'],
+    rivers:['Tevere','Nera','Chiascio'], mountains:['Appennino Umbro-Marchigiano','Monti Sibillini'], lakes:['Trasimeno'] },
+  { id:'marche', name:'Marche', capital:'Ancona', position:'centro', borders:['emilia-romagna','toscana','umbria','lazio','abruzzo'],
+    rivers:['Metauro','Esino','Tronto'], mountains:['Monti Sibillini','Conero','Appennino Umbro-Marchigiano'], lakes:[] },
+  { id:'lazio', name:'Lazio', capital:'Roma', position:'centro', borders:['toscana','umbria','marche','abruzzo','molise','campania'],
+    rivers:['Tevere','Aniene','Liri','Garigliano'], mountains:['Appennino Centrale','Monti Lepini','Monti Aurunci'], lakes:['Bracciano','Bolsena','Albano'] },
+  { id:'abruzzo', name:'Abruzzo', capital:"L'Aquila", position:'sud', borders:['marche','lazio','molise'],
+    rivers:['Pescara','Sangro','Aterno'], mountains:['Gran Sasso','Maiella','Appennino Centrale'], lakes:['Scanno'] },
+  { id:'molise', name:'Molise', capital:'Campobasso', position:'sud', borders:['abruzzo','lazio','campania','puglia'],
+    rivers:['Biferno','Trigno','Volturno'], mountains:['Matese','Appennino Sannita'], lakes:[] },
+  { id:'campania', name:'Campania', capital:'Napoli', position:'sud', borders:['lazio','molise','puglia','basilicata'],
+    rivers:['Volturno','Sele','Sarno'], mountains:['Vesuvio','Appennino Campano'], lakes:['Averno'] },
+  { id:'puglia', name:'Puglia', capital:'Bari', position:'sud', borders:['molise','campania','basilicata'],
+    rivers:['Ofanto','Fortore'], mountains:['Gargano','Murge','Monti Dauni'], lakes:['Lesina','Varano'] },
+  { id:'basilicata', name:'Basilicata', capital:'Potenza', position:'sud', borders:['campania','puglia','calabria'],
+    rivers:['Bradano','Basento','Agri','Sinni'], mountains:['Pollino','Vulture','Sirino','Appennino Lucano'], lakes:[] },
+  { id:'calabria', name:'Calabria', capital:'Catanzaro', position:'sud', borders:['basilicata'],
+    rivers:['Crati','Neto','Savuto'], mountains:['Pollino','Sila','Aspromonte','Serre'], lakes:[] },
+  { id:'sicilia', name:'Sicilia', capital:'Palermo', position:'isole', borders:[],
+    rivers:['Salso','Simeto','Belice','Platani'], mountains:['Etna','Madonie','Nebrodi','Peloritani'], lakes:[] },
+  { id:'sardegna', name:'Sardegna', capital:'Cagliari', position:'isole', borders:[],
+    rivers:['Tirso','Flumendosa','Coghinas'], mountains:['Gennargentu','Limbara','Monti del Sulcis'], lakes:['Omodeo'] }
 ];
+
+const ITALY_FACTS = {
+  longestRiver: 'Po',
+  highestMountain: 'Monte Bianco',
+  biggestLake: 'Garda',
+  regionWithMostLakes: 'Lombardia',
+  totalRegions: 20,
+  specialStatuteRegions: 5,
+  zones: ['Nord-Ovest','Nord-Est','Centro','Sud','Isole']
+};
 
 const POSITION_LABEL = {
   'nord-ovest': 'Nord-Ovest',
@@ -1102,7 +1132,11 @@ function getRecommendation(scores, gender) {
     'border-is':  { plain: 'i confini tra regioni',           on: 'sui confini tra regioni',           to: 'ai confini tra regioni' },
     'border-not': { plain: 'i confini tra regioni',           on: 'sui confini tra regioni',           to: 'ai confini tra regioni' },
     'position':   { plain: 'la posizione delle regioni',      on: 'sulla posizione delle regioni',     to: 'alla posizione delle regioni' },
-    'identify':   { plain: 'il riconoscimento delle regioni', on: 'sul riconoscimento delle regioni', to: 'al riconoscimento delle regioni' }
+    'identify':   { plain: 'il riconoscimento delle regioni', on: 'sul riconoscimento delle regioni', to: 'al riconoscimento delle regioni' },
+    'river':      { plain: 'i fiumi',                         on: 'sui fiumi',                         to: 'ai fiumi' },
+    'mountain':   { plain: 'i monti e le catene montuose',    on: 'sui monti e le catene montuose',    to: 'ai monti e alle catene montuose' },
+    'lake':       { plain: 'i laghi',                         on: 'sui laghi',                         to: 'ai laghi' },
+    'global':     { plain: "le domande sull'Italia in generale", on: "sulle domande sull'Italia in generale", to: "alle domande sull'Italia in generale" }
   };
   // Area labels: { plain: with article, of: "of X" form (di + il -> del/della/delle) }
   const AREA_LABEL = {
@@ -1450,18 +1484,116 @@ function genQuestionCapital(region) {
   };
 }
 
+function genQuestionRiver(region) {
+  if (!region.rivers || region.rivers.length === 0) return null;
+  const correct = pick(region.rivers);
+  const pool = [...new Set(REGIONS.filter(r => r.id !== region.id)
+    .flatMap(r => r.rivers || [])
+    .filter(r => !region.rivers.includes(r)))];
+  if (pool.length < 3) return null;
+  const wrong = pickN(pool, 3);
+  const choices = shuffle([correct, ...wrong]);
+  return {
+    type: 'river',
+    text: `Quale fiume passa per ${prep(region)}${region.name}?`,
+    showMap: true,
+    mapHighlight: region.id,
+    correct,
+    choices,
+    region
+  };
+}
+
+function genQuestionMountain(region) {
+  if (!region.mountains || region.mountains.length === 0) return null;
+  const correct = pick(region.mountains);
+  const pool = [...new Set(REGIONS.filter(r => r.id !== region.id)
+    .flatMap(r => r.mountains || [])
+    .filter(m => !region.mountains.includes(m)))];
+  if (pool.length < 3) return null;
+  const wrong = pickN(pool, 3);
+  const choices = shuffle([correct, ...wrong]);
+  return {
+    type: 'mountain',
+    text: `Quale catena o monte si trova in ${prep(region)}${region.name}?`,
+    showMap: true,
+    mapHighlight: region.id,
+    correct,
+    choices,
+    region
+  };
+}
+
+function genQuestionLake(region) {
+  if (!region.lakes || region.lakes.length === 0) return null;
+  const correct = pick(region.lakes);
+  const pool = [...new Set(REGIONS.filter(r => r.id !== region.id)
+    .flatMap(r => r.lakes || [])
+    .filter(l => !region.lakes.includes(l)))];
+  if (pool.length < 3) return null;
+  const wrong = pickN(pool, 3);
+  const choices = shuffle([correct, ...wrong]);
+  return {
+    type: 'lake',
+    text: `Quale lago si trova in ${prep(region)}${region.name}?`,
+    showMap: true,
+    mapHighlight: region.id,
+    correct,
+    choices,
+    region
+  };
+}
+
+function genQuestionGlobal() {
+  const allRivers = [...new Set(REGIONS.flatMap(r => r.rivers || []))];
+  const allMountains = [...new Set(REGIONS.flatMap(r => r.mountains || []))];
+  const allLakes = [...new Set(REGIONS.flatMap(r => r.lakes || []))];
+  const allRegionNames = REGIONS.map(r => r.name);
+  const patterns = [
+    () => ({ text: "Qual è il fiume più lungo d'Italia?", correct: ITALY_FACTS.longestRiver,
+      pool: allRivers, region: REGIONS.find(r => (r.rivers || []).includes(ITALY_FACTS.longestRiver)) || null }),
+    () => ({ text: "Qual è il lago più grande d'Italia?", correct: ITALY_FACTS.biggestLake,
+      pool: allLakes, region: REGIONS.find(r => (r.lakes || []).includes(ITALY_FACTS.biggestLake)) || null }),
+    () => ({ text: "Quale regione italiana ha più laghi?", correct: ITALY_FACTS.regionWithMostLakes,
+      pool: allRegionNames, region: REGIONS.find(r => r.name === ITALY_FACTS.regionWithMostLakes) || null }),
+    () => ({ text: "Qual è il monte più alto d'Italia?", correct: ITALY_FACTS.highestMountain,
+      pool: [...allMountains, ITALY_FACTS.highestMountain], region: null }),
+    () => ({ text: "Quante regioni ha l'Italia?", correct: String(ITALY_FACTS.totalRegions),
+      pool: ['15','18','19','20','21','22','25'], region: null }),
+    () => ({ text: "Quante sono le regioni italiane a statuto speciale?", correct: String(ITALY_FACTS.specialStatuteRegions),
+      pool: ['3','4','5','6','7','8'], region: null }),
+    () => ({ text: "Quale di queste è una zona geografica dell'Italia?", correct: pick(ITALY_FACTS.zones),
+      pool: [...ITALY_FACTS.zones, 'Nord-Centro','Sud-Ovest','Sud-Est','Mediterraneo','Adriatico'], region: null })
+  ];
+  const p = pick(patterns)();
+  const wrong = pickN([...new Set(p.pool.filter(x => x !== p.correct))], 3);
+  return {
+    type: 'global',
+    text: p.text,
+    showMap: false,
+    mapHighlight: null,
+    correct: p.correct,
+    choices: shuffle([p.correct, ...wrong]),
+    region: p.region
+  };
+}
+
 const QUESTION_GENERATORS = {
   'capital': genQuestionCapital,
   'border-is': genQuestionBorderIs,
   'border-not': genQuestionBorderNot,
   'position': genQuestionPosition,
-  'identify': genQuestionIdentify
+  'identify': genQuestionIdentify,
+  'river': genQuestionRiver,
+  'mountain': genQuestionMountain,
+  'lake': genQuestionLake,
+  'global': genQuestionGlobal
 };
 
 function buildQuiz(count, difficulty) {
   const questions = [];
   const usedKeys = new Set();
-  const types = ['capital', 'border-is', 'border-not', 'position', 'identify'];
+  const types = ['capital', 'border-is', 'border-not', 'position', 'identify', 'river', 'mountain', 'lake', 'global'];
   let attempts = 0;
   while (questions.length < count && attempts < 200) {
     attempts++;
