@@ -1833,8 +1833,9 @@ const Sync = (() => {
 
   // On first launch of the new version: take whatever is in localStorage and
   // push it to the server so existing histories are not lost.
-  async function importBaselineIfNeeded() {
-    if (localStorage.getItem(BASELINE_KEY)) return false;  // already done
+  // Pass `force=true` (e.g. via ?import URL param) to retry even if the flag is set.
+  async function importBaselineIfNeeded(force) {
+    if (!force && localStorage.getItem(BASELINE_KEY)) return false;  // already done
     if (!isOnline()) return false;
     const allProfileIds = Store.getAllProfiles().map(p => p.id);
     // include any geo_scores_* keys that aren't covered (custom profiles previously created)
@@ -1846,14 +1847,21 @@ const Sync = (() => {
       }
     }
     let imported = 0;
+    let failures = 0;
     for (const id of allProfileIds) {
       const local = Store.getScores(id);
       if (local.length) {
         const ok = await putScores(id, local);
         if (ok) imported += local.length;
+        else failures++;
       }
     }
-    localStorage.setItem(BASELINE_KEY, '1');
+    // Only mark baseline complete when no PUT failed. If the network blipped or
+    // the user closed the page mid-fetch, leave the flag unset so we retry next
+    // time — losing histories on a flaky first launch would be unacceptable.
+    if (failures === 0) {
+      localStorage.setItem(BASELINE_KEY, '1');
+    }
     return imported;
   }
 
@@ -3283,9 +3291,19 @@ function init() {
   //    server-enabled version ships — protects existing histories.
   // 2. Pull everything from server and merge into localStorage so the active
   //    profile sees updated stats from other devices.
+  // ?import in the URL forces a re-import even if the flag is set — used to
+  // recover when the very first run was interrupted before the PUT finished.
+  const forceImport = new URLSearchParams(location.search).has('import');
+  if (forceImport) localStorage.removeItem('geo_synced_v1');
   (async () => {
     try {
-      await Sync.importBaselineIfNeeded();
+      const importedCount = await Sync.importBaselineIfNeeded(forceImport);
+      if (forceImport) {
+        // Clean the URL so a refresh doesn't keep re-triggering the import.
+        history.replaceState(null, '', location.pathname);
+        // Quick visible confirmation for the parent who just kicked it off.
+        showToast(importedCount ? '✅ Sincronizzato (' + importedCount + ' partite)' : '✅ Sincronizzato');
+      }
       const ok = await Sync.pullAll();
       if (ok) {
         // Re-render whatever's currently on screen so new data shows up.
