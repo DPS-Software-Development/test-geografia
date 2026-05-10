@@ -20,12 +20,12 @@
   "regions": [
     { "id": "valle-d-aosta",          "name": "Valle d'Aosta",          "capital": "Aosta",      "position": "nord-ovest", "borders": ["piemonte"],
       "rivers": ["Dora Baltea"],
-      "mountains": ["Alpi", "Monte Bianco", "Cervino", "Monte Rosa"],
+      "mountains": ["Alpi", "Monte Bianco", "Cervino", "Monte Rosa", "Gran Paradiso"],
       "lakes": [] },
 
     { "id": "piemonte",               "name": "Piemonte",               "capital": "Torino",     "position": "nord-ovest", "borders": ["valle-d-aosta", "lombardia", "liguria", "emilia-romagna"],
-      "rivers": ["Po", "Dora Baltea", "Tanaro", "Ticino"],
-      "mountains": ["Alpi", "Monviso", "Gran Paradiso", "Appennino Ligure"],
+      "rivers": ["Po", "Dora Baltea", "Tanaro", "Ticino", "Sesia"],
+      "mountains": ["Alpi", "Monviso", "Gran Paradiso", "Monte Rosa", "Appennino Ligure"],
       "lakes": ["Maggiore", "Orta"] },
 
     { "id": "lombardia",              "name": "Lombardia",              "capital": "Milano",     "position": "nord-ovest", "borders": ["piemonte", "trentino-alto-adige", "veneto", "emilia-romagna"],
@@ -34,8 +34,8 @@
       "lakes": ["Garda", "Como", "Maggiore", "Iseo", "Lugano"] },
 
     { "id": "liguria",                "name": "Liguria",                "capital": "Genova",     "position": "nord-ovest", "borders": ["piemonte", "emilia-romagna", "toscana"],
-      "rivers": ["Magra", "Roia"],
-      "mountains": ["Alpi Marittime", "Appennino Ligure"],
+      "rivers": ["Magra", "Tanaro", "Bormida", "Scrivia", "Trebbia", "Vara"],
+      "mountains": ["Alpi Marittime", "Appennino Ligure", "Monte Saccarello", "Monte Maggiorasca"],
       "lakes": [] },
 
     { "id": "trentino-alto-adige",    "name": "Trentino-Alto Adige",    "capital": "Trento",     "position": "nord-est",   "borders": ["lombardia", "veneto"],
@@ -44,18 +44,18 @@
       "lakes": ["Garda", "Braies"] },
 
     { "id": "veneto",                 "name": "Veneto",                 "capital": "Venezia",    "position": "nord-est",   "borders": ["lombardia", "trentino-alto-adige", "friuli-venezia-giulia", "emilia-romagna"],
-      "rivers": ["Po", "Adige", "Piave", "Brenta"],
-      "mountains": ["Dolomiti", "Marmolada", "Prealpi Venete"],
+      "rivers": ["Po", "Adige", "Piave", "Brenta", "Tagliamento", "Livenza"],
+      "mountains": ["Dolomiti", "Marmolada", "Prealpi Venete", "Tre Cime di Lavaredo", "Monte Civetta", "Monte Grappa", "Monte Baldo", "Altopiano di Asiago", "Monti Lessini", "Colli Euganei", "Monti Berici", "Alpi Carniche"],
       "lakes": ["Garda"] },
 
     { "id": "friuli-venezia-giulia",  "name": "Friuli-Venezia Giulia",  "capital": "Trieste",    "position": "nord-est",   "borders": ["veneto"],
       "rivers": ["Tagliamento", "Isonzo"],
-      "mountains": ["Alpi Carniche", "Alpi Giulie"],
+      "mountains": ["Alpi Carniche", "Alpi Giulie", "Prealpi Carniche", "Prealpi Giulie", "Monte Coglians", "Monte Pramaggiore", "Altopiano del Carso"],
       "lakes": [] },
 
     { "id": "emilia-romagna",         "name": "Emilia-Romagna",         "capital": "Bologna",    "position": "nord-est",   "borders": ["lombardia", "veneto", "marche", "toscana", "liguria"],
-      "rivers": ["Po", "Reno", "Secchia", "Panaro"],
-      "mountains": ["Appennino Tosco-Emiliano", "Monte Cimone"],
+      "rivers": ["Po", "Reno", "Secchia", "Panaro", "Trebbia", "Taro", "Savio"],
+      "mountains": ["Appennino Tosco-Emiliano", "Appennino Ligure", "Monte Cimone", "Monte Falterona", "Monte Maggiorasca", "Monte Fumaiolo"],
       "lakes": [] },
 
     { "id": "toscana",                "name": "Toscana",                "capital": "Firenze",    "position": "centro",     "borders": ["liguria", "emilia-romagna", "marche", "umbria", "lazio"],
@@ -63,14 +63,14 @@
       "mountains": ["Alpi Apuane", "Appennino Tosco-Emiliano", "Monte Amiata"],
       "lakes": [] },
 
-    { "id": "umbria",                 "name": "Umbria",                 "capital": "Perugia",    "position": "centro",     "borders": ["toscana", "marche", "lazio"],
-      "rivers": ["Tevere", "Nera", "Chiascio"],
-      "mountains": ["Appennino Umbro-Marchigiano", "Monti Sibillini"],
+    { "id": "umbria",                 "name": "Umbria",                 "capital": "Perugia",    "position": "centro",     "borders": ["toscana", "marche", "lazio", "abruzzo"],
+      "rivers": ["Tevere", "Nera", "Velino"],
+      "mountains": ["Appennino Umbro-Marchigiano", "Monti Sibillini", "Monte Subasio", "Monte Vettore"],
       "lakes": ["Trasimeno"] },
 
     { "id": "marche",                 "name": "Marche",                 "capital": "Ancona",     "position": "centro",     "borders": ["emilia-romagna", "toscana", "umbria", "lazio", "abruzzo"],
-      "rivers": ["Metauro", "Esino", "Tronto"],
-      "mountains": ["Monti Sibillini", "Conero", "Appennino Umbro-Marchigiano"],
+      "rivers": ["Metauro", "Esino", "Tronto", "Foglia", "Potenza", "Chienti"],
+      "mountains": ["Monti Sibillini", "Conero", "Appennino Umbro-Marchigiano", "Monte Vettore", "Monte Catria"],
       "lakes": [] },
 
     { "id": "lazio",                  "name": "Lazio",                  "capital": "Roma",       "position": "centro",     "borders": ["toscana", "umbria", "marche", "abruzzo", "molise", "campania"],
@@ -78,34 +78,34 @@
       "mountains": ["Appennino Centrale", "Monti Cimini", "Colli Albani"],
       "lakes": ["Bracciano", "Bolsena", "Vico"] },
 
-    { "id": "abruzzo",                "name": "Abruzzo",                "capital": "L'Aquila",   "position": "sud",        "borders": ["marche", "lazio", "molise"],
-      "rivers": ["Pescara", "Sangro", "Aterno"],
-      "mountains": ["Gran Sasso", "Maiella", "Appennino Centrale"],
-      "lakes": ["Scanno"] },
+    { "id": "abruzzo",                "name": "Abruzzo",                "capital": "L'Aquila",   "position": "sud",        "borders": ["marche", "lazio", "molise", "umbria"],
+      "rivers": ["Pescara", "Sangro", "Aterno", "Tronto", "Vomano"],
+      "mountains": ["Gran Sasso", "Maiella", "Appennino Abruzzese", "Monti della Laga", "Monti della Meta"],
+      "lakes": ["Campotosto"] },
 
     { "id": "molise",                 "name": "Molise",                 "capital": "Campobasso", "position": "sud",        "borders": ["abruzzo", "lazio", "campania", "puglia"],
-      "rivers": ["Biferno", "Trigno", "Volturno"],
-      "mountains": ["Matese", "Appennino Sannita"],
-      "lakes": [] },
+      "rivers": ["Biferno", "Trigno", "Volturno", "Fortore"],
+      "mountains": ["Matese", "Appennino Sannita", "Monti della Meta"],
+      "lakes": ["Guardialfiera", "Occhito"] },
 
     { "id": "campania",               "name": "Campania",               "capital": "Napoli",     "position": "sud",        "borders": ["lazio", "molise", "puglia", "basilicata"],
-      "rivers": ["Volturno", "Sele", "Sarno"],
-      "mountains": ["Vesuvio", "Appennino Campano"],
-      "lakes": ["Averno"] },
+      "rivers": ["Sele"],
+      "mountains": ["Vesuvio", "Appennino Campano", "Monti del Matese"],
+      "lakes": [] },
 
     { "id": "puglia",                 "name": "Puglia",                 "capital": "Bari",       "position": "sud",        "borders": ["molise", "campania", "basilicata"],
       "rivers": ["Ofanto", "Fortore"],
-      "mountains": ["Gargano", "Murge", "Monti Dauni"],
-      "lakes": ["Lesina", "Varano"] },
+      "mountains": ["Gargano", "Murge"],
+      "lakes": [] },
 
     { "id": "basilicata",             "name": "Basilicata",             "capital": "Potenza",    "position": "sud",        "borders": ["campania", "puglia", "calabria"],
       "rivers": ["Bradano", "Basento", "Agri", "Sinni"],
-      "mountains": ["Pollino", "Vulture", "Sirino", "Appennino Lucano"],
+      "mountains": ["Pollino", "Volturino", "Sirino", "Appennino Lucano"],
       "lakes": [] },
 
     { "id": "calabria",               "name": "Calabria",               "capital": "Catanzaro",  "position": "sud",        "borders": ["basilicata"],
-      "rivers": ["Crati", "Neto", "Savuto"],
-      "mountains": ["Pollino", "Sila", "Aspromonte", "Serre"],
+      "rivers": [],
+      "mountains": ["Pollino", "Sila", "Aspromonte"],
       "lakes": [] },
 
     { "id": "sicilia",                "name": "Sicilia",                "capital": "Palermo",    "position": "isole",      "borders": [],
@@ -115,7 +115,7 @@
 
     { "id": "sardegna",               "name": "Sardegna",               "capital": "Cagliari",   "position": "isole",      "borders": [],
       "rivers": ["Tirso", "Flumendosa", "Coghinas"],
-      "mountains": ["Gennargentu", "Limbara", "Monti del Sulcis"],
+      "mountains": ["Gennargentu", "Supramonte"],
       "lakes": ["Omodeo"] }
   ]
 }
