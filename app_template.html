@@ -105,6 +105,9 @@ button {
   border: none;
   background: none;
   color: inherit;
+  /* Kill iOS 300ms tap delay + ignore non-tap gestures so a brief tap can't
+     leave a "stuck" :active / :hover state on touch devices. */
+  touch-action: manipulation;
 }
 
 .btn-primary, .btn-secondary {
@@ -122,7 +125,6 @@ button {
   color: #fff;
   box-shadow: var(--shadow);
 }
-.btn-primary:hover { background: var(--coral-dark); }
 .btn-primary:active { transform: scale(0.98); box-shadow: var(--shadow); }
 
 .btn-secondary {
@@ -130,7 +132,6 @@ button {
   color: var(--primary-dark);
   border: 2px solid var(--primary);
 }
-.btn-secondary:hover { background: rgba(58, 125, 138, 0.08); }
 .btn-secondary:active { transform: scale(0.98); }
 
 .btn-icon {
@@ -186,7 +187,6 @@ button {
   text-align: left;
   width: 100%;
 }
-.profile-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 .profile-btn:active { transform: scale(0.98); }
 
 .profile-btn .avatar {
@@ -207,11 +207,6 @@ button {
 .profile-btn-add {
   background: transparent;
   border: 2px dashed rgba(58, 125, 138, 0.35);
-  box-shadow: none;
-}
-.profile-btn-add:hover {
-  background: rgba(58, 125, 138, 0.06);
-  transform: none;
   box-shadow: none;
 }
 .profile-btn-add .avatar {
@@ -551,13 +546,12 @@ button {
   font-weight: 600;
   color: var(--primary-dark);
   text-align: left;
-  transition: all 0.18s;
+  /* Explicit transitions excluding `transform` so any :active scale resets instantly
+     when the button is removed mid-tap (was `transition: all 0.18s` — caused the
+     "selection lingers" perception). */
+  transition: background-color 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-}
-
-.answer-btn:hover {
-  border-color: var(--primary);
-  background: rgba(58, 125, 138, 0.04);
+  touch-action: manipulation;
 }
 
 .answer-btn:active { transform: scale(0.98); }
@@ -631,7 +625,6 @@ button {
   font-family: inherit;
   transition: transform 0.1s, box-shadow 0.2s;
 }
-.study-cell:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
 .study-cell:active { transform: scale(0.97); }
 .study-cell .study-init {
   width: 36px; height: 36px; flex: 0 0 36px;
@@ -720,7 +713,6 @@ button {
   transition: background 0.15s;
   font-family: inherit;
 }
-.border-chip:hover { background: var(--sage); }
 .border-chip:active { background: var(--olive); color: #fff; }
 
 /* ----- FAMILY PROGRESS CARD ----- */
@@ -1076,6 +1068,27 @@ button {
     transform: translateY(100vh) rotate(720deg);
     opacity: 0;
   }
+}
+
+/* ----- HOVER STATES (mouse-only, not sticky on touch) -----
+   Applied only to devices with a true hover-capable fine pointer.
+   On touch devices, :hover otherwise sticks after a tap and makes the
+   newly-rendered answer button look "pre-selected". */
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { background: var(--coral-dark); }
+  .btn-secondary:hover { background: rgba(58, 125, 138, 0.08); }
+  .profile-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .profile-btn-add:hover {
+    background: rgba(58, 125, 138, 0.06);
+    transform: none;
+    box-shadow: none;
+  }
+  .answer-btn:hover {
+    border-color: var(--primary);
+    background: rgba(58, 125, 138, 0.04);
+  }
+  .study-cell:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .border-chip:hover { background: var(--sage); }
 }
 
 /* ----- RESPONSIVE: TABLET / DESKTOP ----- */
@@ -1951,10 +1964,16 @@ function startQuiz() {
 }
 
 function renderQuestion() {
-  // Clear any lingering focus from the previously-clicked answer button
-  // (fix bug: il pulsante della domanda precedente restava visibilmente selezionato)
+  // Hard reset of any lingering interaction state from the previous question:
+  // blur whatever has focus, then park focus on a non-focusable neutral anchor
+  // so :focus-visible heuristics don't latch onto the first new answer button.
   if (document.activeElement && typeof document.activeElement.blur === 'function') {
     document.activeElement.blur();
+  }
+  const anchor = $('#question-text');
+  if (anchor) {
+    anchor.setAttribute('tabindex', '-1');
+    try { anchor.focus({ preventScroll: true }); anchor.blur(); } catch (e) {}
   }
   const q = state.questions[state.currentIndex];
   state.locked = false;
