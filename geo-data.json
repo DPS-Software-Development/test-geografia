@@ -24,7 +24,7 @@
       "lakes": [] },
 
     { "id": "piemonte",               "name": "Piemonte",               "capital": "Torino",     "position": "nord-ovest", "borders": ["valle-d-aosta", "lombardia", "liguria", "emilia-romagna"],
-      "rivers": ["Po", "Dora Baltea", "Tanaro", "Ticino", "Sesia"],
+      "rivers": ["Po", "Dora Baltea", "Dora Riparia", "Tanaro", "Ticino", "Sesia", "Scrivia"],
       "mountains": ["Alpi", "Monviso", "Gran Paradiso", "Monte Rosa", "Appennino Ligure"],
       "lakes": ["Maggiore", "Orta"] },
 
@@ -53,7 +53,7 @@
       "mountains": ["Alpi Carniche", "Alpi Giulie", "Prealpi Carniche", "Prealpi Giulie", "Monte Coglians", "Monte Pramaggiore", "Altopiano del Carso"],
       "lakes": [] },
 
-    { "id": "emilia-romagna",         "name": "Emilia-Romagna",         "capital": "Bologna",    "position": "nord-est",   "borders": ["lombardia", "veneto", "marche", "toscana", "liguria"],
+    { "id": "emilia-romagna",         "name": "Emilia-Romagna",         "capital": "Bologna",    "position": "nord-est",   "borders": ["lombardia", "veneto", "marche", "toscana", "liguria", "piemonte"],
       "rivers": ["Po", "Reno", "Secchia", "Panaro", "Trebbia", "Taro", "Savio"],
       "mountains": ["Appennino Tosco-Emiliano", "Appennino Ligure", "Monte Cimone", "Monte Falterona", "Monte Maggiorasca", "Monte Fumaiolo"],
       "lakes": [] },
@@ -75,10 +75,10 @@
 
     { "id": "lazio",                  "name": "Lazio",                  "capital": "Roma",       "position": "centro",     "borders": ["toscana", "umbria", "marche", "abruzzo", "molise", "campania"],
       "rivers": ["Tevere"],
-      "mountains": ["Appennino Centrale", "Monti Cimini", "Colli Albani"],
+      "mountains": ["Appennino Laziale", "Monti Cimini", "Colli Albani"],
       "lakes": ["Bracciano", "Bolsena", "Vico"] },
 
-    { "id": "abruzzo",                "name": "Abruzzo",                "capital": "L'Aquila",   "position": "sud",        "borders": ["marche", "lazio", "molise", "umbria"],
+    { "id": "abruzzo",                "name": "Abruzzo",                "capital": "L'Aquila",   "position": "centro",     "borders": ["marche", "lazio", "molise", "umbria"],
       "rivers": ["Pescara", "Sangro", "Aterno", "Tronto", "Vomano"],
       "mountains": ["Gran Sasso", "Maiella", "Appennino Abruzzese", "Monti della Laga", "Monti della Meta"],
       "lakes": ["Campotosto"] },
@@ -89,14 +89,14 @@
       "lakes": ["Guardialfiera", "Occhito"] },
 
     { "id": "campania",               "name": "Campania",               "capital": "Napoli",     "position": "sud",        "borders": ["lazio", "molise", "puglia", "basilicata"],
-      "rivers": ["Sele"],
+      "rivers": ["Volturno", "Calore", "Sele"],
       "mountains": ["Vesuvio", "Appennino Campano", "Monti del Matese"],
       "lakes": [] },
 
     { "id": "puglia",                 "name": "Puglia",                 "capital": "Bari",       "position": "sud",        "borders": ["molise", "campania", "basilicata"],
       "rivers": ["Ofanto", "Fortore"],
       "mountains": ["Gargano", "Murge"],
-      "lakes": [] },
+      "lakes": ["Lesina", "Varano"] },
 
     { "id": "basilicata",             "name": "Basilicata",             "capital": "Potenza",    "position": "sud",        "borders": ["campania", "puglia", "calabria"],
       "rivers": ["Bradano", "Basento", "Agri", "Sinni"],
@@ -104,13 +104,13 @@
       "lakes": [] },
 
     { "id": "calabria",               "name": "Calabria",               "capital": "Catanzaro",  "position": "sud",        "borders": ["basilicata"],
-      "rivers": [],
+      "rivers": ["Crati", "Neto", "Trionto"],
       "mountains": ["Pollino", "Sila", "Aspromonte"],
-      "lakes": [] },
+      "lakes": ["Cecita", "Arvo", "Ampollino"] },
 
     { "id": "sicilia",                "name": "Sicilia",                "capital": "Palermo",    "position": "isole",      "borders": [],
       "rivers": ["Salso", "Simeto", "Platani"],
-      "mountains": ["Etna", "Madonie", "Nebrodi", "Peloritani"],
+      "mountains": ["Etna", "Madonie", "Nebrodi", "Peloritani", "Erei", "Iblei", "Sicani"],
       "lakes": [] },
 
     { "id": "sardegna",               "name": "Sardegna",               "capital": "Cagliari",   "position": "isole",      "borders": [],
