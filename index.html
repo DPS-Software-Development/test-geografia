@@ -1113,46 +1113,54 @@ function getRecommendation(scores) {
   const top = obj => Object.entries(obj).sort((a, b) => b[1] - a[1])[0];
   const tType = top(byType), tArea = top(byArea), tCombo = top(byTypeArea);
 
+  // Type labels: plain (with article), on (su+art form), to (a+art form)
   const TYPE_LABEL = {
-    'capital': 'i capoluoghi',
-    'border-is': 'i confini tra regioni',
-    'border-not': 'i confini tra regioni',
-    'position': 'la posizione delle regioni sulla mappa',
-    'identify': 'il riconoscimento delle regioni'
+    'capital':    { plain: 'i capoluoghi',                    on: 'sui capoluoghi',                    to: 'ai capoluoghi' },
+    'border-is':  { plain: 'i confini tra regioni',           on: 'sui confini tra regioni',           to: 'ai confini tra regioni' },
+    'border-not': { plain: 'i confini tra regioni',           on: 'sui confini tra regioni',           to: 'ai confini tra regioni' },
+    'position':   { plain: 'la posizione delle regioni',      on: 'sulla posizione delle regioni',     to: 'alla posizione delle regioni' },
+    'identify':   { plain: 'il riconoscimento delle regioni', on: 'sul riconoscimento delle regioni', to: 'al riconoscimento delle regioni' }
   };
+  // Area labels: { plain: with article, of: "of X" form (di + il -> del/della/delle) }
   const AREA_LABEL = {
-    'nord-ovest': 'Nord-Ovest', 'nord-est': 'Nord-Est',
-    'centro': 'Centro Italia', 'sud': 'Sud Italia', 'isole': 'le Isole'
+    'nord-ovest': { plain: 'il Nord-Ovest',  of: 'del Nord-Ovest' },
+    'nord-est':   { plain: 'il Nord-Est',    of: 'del Nord-Est' },
+    'centro':     { plain: 'il Centro Italia', of: 'del Centro Italia' },
+    'sud':        { plain: 'il Sud Italia',  of: 'del Sud Italia' },
+    'isole':      { plain: 'le Isole',       of: 'delle Isole' }
   };
+  const FALLBACK_TYPE = { plain: 'queste domande', on: 'su queste domande', to: 'a queste domande' };
+  const FALLBACK_AREA = { plain: 'questa zona', of: 'di questa zona' };
 
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
   if (tCombo && tCombo[1] >= 2 && tCombo[1] >= Math.ceil(totalErrors * 0.4)) {
     const [type, area] = tCombo[0].split('|');
-    const t = TYPE_LABEL[type] || 'questo tipo di domande';
-    const a = AREA_LABEL[area] || 'questa zona';
+    const t = TYPE_LABEL[type] || FALLBACK_TYPE;
+    const a = AREA_LABEL[area] || FALLBACK_AREA;
     return pick([
-      { title: 'Un piccolo ripasso!', body: `Concentrati su ${t} del ${a}: con un po' di pratica saranno facilissimi!`, emoji: '🗺️' },
-      { title: 'Sei sulla strada giusta', body: `Ti consiglio di rivedere ${t} del ${a}. Ce la fai!`, emoji: '📚' },
-      { title: 'Suggerimento per te', body: `${t.charAt(0).toUpperCase() + t.slice(1)} del ${a} ti daranno meno filo da torcere con un ripassino.`, emoji: '💡' }
+      { title: 'Un piccolo ripasso!', body: `Concentrati ${t.on} ${a.of}: con un po' di pratica saranno facilissimi!`, emoji: '🗺️' },
+      { title: 'Sei sulla strada giusta', body: `Ti consiglio di rivedere ${t.plain} ${a.of}. Ce la fai!`, emoji: '📚' },
+      { title: 'Suggerimento per te', body: `${cap(t.plain)} ${a.of} ti daranno meno filo da torcere con un ripassino.`, emoji: '💡' }
     ]);
   }
 
   if (tType && tType[1] >= 2 && tType[1] >= Math.ceil(totalErrors * 0.5)) {
-    const t = TYPE_LABEL[tType[0]] || 'queste domande';
+    const t = TYPE_LABEL[tType[0]] || FALLBACK_TYPE;
     return pick([
-      { title: 'Idea per migliorare', body: `Ti consiglio di ripassare ${t}: vedrai che diventeranno il tuo punto forte!`, emoji: '📖' },
-      { title: 'Prossimo obiettivo', body: `Dedica un po' di tempo a ${t} e farai un salto in avanti!`, emoji: '🎯' },
-      { title: 'Piccolo consiglio', body: `Concentrati su ${t} nel prossimo quiz, sei vicinissima!`, emoji: '✏️' }
+      { title: 'Idea per migliorare', body: `Ti consiglio di ripassare ${t.plain}: vedrai che diventeranno il tuo punto forte!`, emoji: '📖' },
+      { title: 'Prossimo obiettivo', body: `Dedica un po' di tempo ${t.to} e farai un salto in avanti!`, emoji: '🎯' },
+      { title: 'Piccolo consiglio', body: `Concentrati ${t.on} nel prossimo quiz, sei vicinissima!`, emoji: '✏️' }
     ]);
   }
 
   if (tArea && tArea[1] >= 2 && tArea[1] >= Math.ceil(totalErrors * 0.5)) {
-    const a = AREA_LABEL[tArea[0]] || 'questa zona';
+    const a = AREA_LABEL[tArea[0]] || FALLBACK_AREA;
     return pick([
-      { title: 'Esploriamo insieme', body: `Concentrati sulle regioni del ${a}: dai un'occhiata alla mappa e saranno tue!`, emoji: '🧭' },
-      { title: 'Mini-missione', body: `Le regioni del ${a} aspettano solo te. Un ripasso e vedrai che differenza!`, emoji: '🌍' },
-      { title: 'Hai quasi fatto', body: `Ti consiglio di rivedere il ${a}. Sei più brava di quanto pensi!`, emoji: '🔍' }
+      { title: 'Esploriamo insieme', body: `Concentrati sulle regioni ${a.of}: dai un'occhiata alla mappa e saranno tue!`, emoji: '🧭' },
+      { title: 'Mini-missione', body: `Le regioni ${a.of} aspettano solo te. Un ripasso e vedrai che differenza!`, emoji: '🌍' },
+      { title: 'Hai quasi fatto', body: `Ti consiglio di rivedere ${a.plain}. Sei più brava di quanto pensi!`, emoji: '🔍' }
     ]);
   }
 
